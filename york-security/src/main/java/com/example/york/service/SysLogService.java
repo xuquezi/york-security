@@ -8,4 +8,8 @@ public interface SysLogService {
 
     PageInfo findOperateLogList(String username, Integer pageSize, Integer pageNum);
 
+    void deleteSelected(Integer[] ids);
+
+    void deleteLogById(Integer id);
+
 }

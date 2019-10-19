@@ -12,4 +12,24 @@
         INSERT INTO login_log (login_serial,login_username,login_ip,login_time)
         VALUES (#{loginId},#{loginUsername},#{loginIp},#{loginTime})
     </insert>
+
+    <select id="selectLoginLogList" resultMap="MyBaseResultMap">
+        SELECT ll.login_serial,ll.login_username,ll.login_time,ll.login_ip
+        FROM login_log ll
+        WHERE 1 = 1
+        <if test="loginUsername != null and loginUsername!= ''" >
+            and ll.login_username like '%${loginUsername}%'
+        </if>
+        ORDER BY ll.login_time DESC
+        Limit #{start},#{pageSize}
+    </select>
+
+    <select id="countLoginLogList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM login_log ll
+        WHERE 1 = 1
+        <if test="loginUsername != null and loginUsername!= ''" >
+            and ll.login_username like '%${loginUsername}%'
+        </if>
+    </select>
 </mapper>

@@ -94,8 +94,8 @@ public class UserController {
     @ApiOperation(value="分页查询用户信息列表" ,notes="分页查询用户信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "username", value = "用户名模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "Integer",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "Integer",paramType = "query")
+            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
     public PageResult getUserPageResult(@RequestParam(name = "search",defaultValue = "")String username, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
         // username，pageSize，pageNum都设置了默认值，不会为空
@@ -128,12 +128,12 @@ public class UserController {
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-    @GetMapping("/stopAndUse")
+    @PutMapping("/stopAndUse")
     @SysLog
     @ApiOperation(value="根据userId停用启用用户", notes="根据userId停用启用用户")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "Integer",paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "更新状态", required = true, dataType = "Integer",paramType = "query")
+            @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "更新状态", required = true, dataType = "int",paramType = "query")
     })
     public ResponseResult stopAndUseUser(@RequestParam(value = "userId") Integer userId,@RequestParam (value = "status")Integer status){
         userService.stopAndUseUser(status,userId);
@@ -143,7 +143,7 @@ public class UserController {
     @DeleteMapping("/deleteUser")
     @SysLog
     @ApiOperation(value="根据userId删除用户", notes="根据userId删除用户")
-    @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "Integer",paramType = "query")
+    @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "int",paramType = "query")
     public ResponseResult deleteUser(@RequestParam(value = "userId") Integer userId){
         userService.deleteUser(userId);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);

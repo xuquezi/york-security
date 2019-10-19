@@ -36,4 +36,17 @@
             and sl.username like '%${username}%'
         </if>
     </select>
+
+    <delete id="deleteSelected" parameterType="Integer">
+        DELETE FROM sys_log
+        WHERE log_serial in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteLogById">
+        DELETE from sys_log
+        where log_serial = #{id,jdbcType=INTEGER}
+    </delete>
 </mapper>

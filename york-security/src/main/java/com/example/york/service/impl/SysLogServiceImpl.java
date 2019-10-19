@@ -29,4 +29,14 @@ public class SysLogServiceImpl implements SysLogService {
         Integer total = sysLogMapper.countOperateLogList(username);
         return new PageInfo(total,list);
     }
+
+    @Override
+    public void deleteSelected(Integer[] ids) {
+        sysLogMapper.deleteSelected(ids);
+    }
+
+    @Override
+    public void deleteLogById(Integer id) {
+        sysLogMapper.deleteLogById(id);
+    }
 }

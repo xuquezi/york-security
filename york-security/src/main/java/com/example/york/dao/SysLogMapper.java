@@ -14,4 +14,8 @@ public interface SysLogMapper {
 
     Integer countOperateLogList(@Param("username")String username);
 
+    Integer deleteSelected(Integer[] ids);
+
+    Integer deleteLogById(@Param("id")Integer id);
+
 }
