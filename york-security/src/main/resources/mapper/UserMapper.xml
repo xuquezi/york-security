@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.UserMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.User">
+        <id column="user_serial" property="userId" jdbcType="INTEGER" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="tel" property="tel" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="delete" property="delete" jdbcType="INTEGER"></result>
+        <result column="born" property="born" jdbcType="TIMESTAMP" />
+        <result column="sex" property="sex" jdbcType="INTEGER" />
+        <!-- 多對多的关系映射-->
+        <collection property="roles" ofType="com.example.york.entity.Role">
+            <id column="role_serial" property="roleId" jdbcType="INTEGER"></id>
+            <result column="role_name" property="roleName" jdbcType="VARCHAR"></result>
+            <result column="status" property="status" jdbcType="INTEGER"></result>
+            <result column="desc" property="desc" jdbcType="VARCHAR"></result>
+            <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+            <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+            <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+            <result column="delete" property="delete" jdbcType="INTEGER"></result>
+        </collection>
+    </resultMap>
+    <!--自定义sql-->
+    <select id="findByUsername" resultMap ="MyBaseResultMap">
+        SELECT u.* from user u
+        where u.username = #{username}
+        and u.delete = 0
+    </select>
+
+    <!--只要求角色是有效的！用户是否有效，用户与角色维护的关系是否有效不限制，都用于在前端显示-->
+    <select id="selectUserList" resultMap ="MyBaseResultMap">
+        SELECT uu.user_serial,uu.username,uu.avatar,uu.email,
+        uu.tel,uu.status,uu.create_user,uu.create_time,
+        uu.update_user,uu.update_time,uu.sex,uu.born,
+        r.role_name,r.role_serial
+        FROM
+        (SELECT * from user u
+        WHERE 1 = 1
+        <if test="username != null and username!= ''" >
+            and u.username like '%${username}%'
+        </if>
+        and u.delete = 0
+        limit #{start},#{pageSize}) uu,role r,user_role ur
+        where uu.user_serial = ur.user_id
+        and r.role_serial = ur.role_id
+        and r.status = 0
+        and r.delete = 0
+    </select>
+
+    <select id="countUserList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM user u where u.username in (select DISTINCT uu.username
+        from user uu,user_role ur,role r
+        WHERE 1 = 1
+        <if test="username != null and username!= ''" >
+            and uu.username like '%${username}%'
+        </if>
+        and uu.delete = 0
+        and uu.user_serial = ur.user_id
+        and r.role_serial = ur.role_id
+        and r.status = 0
+        and r.delete = 0
+        )
+    </select>
+
+    <update id="updateUser" parameterType="com.example.york.entity.User">
+        UPDATE user SET
+        username =  #{username,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        tel = #{tel,jdbcType=VARCHAR},
+        sex = #{sex,jdbcType=INTEGER},
+        born = #{born,jdbcType=TIMESTAMP},
+        update_user = #{updateUser,jdbcType=VARCHAR},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        WHERE user_serial = #{userId,jdbcType=INTEGER}
+    </update>
+
+    <update id="stopUser">
+        UPDATE user
+        SET status = 1
+        where user_serial = #{userId,jdbcType=INTEGER}
+    </update>
+
+    <update id="useUser">
+        UPDATE user
+        SET status = 0
+        where user_serial = #{userId,jdbcType=INTEGER}
+    </update>
+
+    <update id="deleteUser">
+        UPDATE user u
+        SET u.delete = 1
+        where u.user_serial = #{userId,jdbcType=INTEGER}
+    </update>
+</mapper>
