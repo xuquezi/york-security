@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.LoginMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.LoginLog">
+        <id column="login_serial" property="loginId" jdbcType="INTEGER"></id>
+        <result column="login_username" property="loginUsername" jdbcType="VARCHAR"></result>
+        <result column="login_ip" property="loginIp" jdbcType="VARCHAR"></result>
+        <result column="login_time" property="loginTime" jdbcType="TIMESTAMP"></result>
+    </resultMap>
+
+    <insert id="saveLoginLog" parameterType="com.example.york.entity.LoginLog">
+        INSERT INTO login_log (login_serial,login_username,login_ip,login_time)
+        VALUES (#{loginId},#{loginUsername},#{loginIp},#{loginTime})
+    </insert>
+</mapper>

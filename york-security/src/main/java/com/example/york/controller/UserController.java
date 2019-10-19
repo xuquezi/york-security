@@ -10,6 +10,7 @@ import com.example.york.entity.User;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
 import com.example.york.entity.result.UserResult;
+import com.example.york.service.LogoutService;
 import com.example.york.service.RoleService;
 import com.example.york.service.UserService;
 import com.example.york.utils.JwtTokenUtil;
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +38,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private LogoutService logoutService;
     //用于测试
     @GetMapping("/test")
     public ResponseResult test(){
@@ -70,7 +74,18 @@ public class UserController {
 
     @GetMapping("/logout")
     @ApiOperation(value="用户退出", notes="用户退出")
-    public ResponseResult logout(){
+    public ResponseResult logout(HttpServletRequest request){
+
+        //记录登出日志start
+        String token = request.getHeader(Const.HEADER_STRING);
+        String ip = getIpAddr(request);
+        JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
+        String username = jwtTokenUtil.getUsernameFromToken(token);
+        if(StringUtils.isNotEmpty(username)){
+            //保存登出日志
+            logoutService.saveLogoutLog(username,ip);
+        }
+        //记录登出日志end
         return new ResponseResult("退出成功", ResponseCode.LOGOUT_SUCCESS);
     }
 
@@ -150,6 +165,21 @@ public class UserController {
             activeUser.setRoles(null);//必须有一个以上角色的限制有前端控制!!如果前端没有控制这里可以抛出异常控制!!
         }
         return activeUser;
+    }
+
+    //获取ip
+    private String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
 

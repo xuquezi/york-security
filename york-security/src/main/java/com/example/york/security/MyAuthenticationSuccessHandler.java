@@ -3,6 +3,7 @@ package com.example.york.security;
 import com.alibaba.fastjson.JSONObject;
 import com.example.york.constant.ResponseCode;
 import com.example.york.entity.result.LoginResult;
+import com.example.york.service.LoginService;
 import com.example.york.utils.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,18 @@ import java.io.IOException;
 public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private LoginService loginService;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("执行到MyAuthenticationSuccessHandler：登录成功的处理类");
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         log.info("用户 " + userDetails.getUsername() + " 登录成功");
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        //记录登入日志start
+        String ip = getIpAddr(request);
+        loginService.saveLoginLog(userDetails.getUsername(),ip);
+        //记录登入日志end
         String token = jwtTokenUtil.generateToken(userDetails);
         renderToken(response, token);
 
@@ -47,5 +54,20 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
         out.write(str.getBytes("UTF-8"));
         out.flush();
         out.close();
+    }
+
+    //获取ip
+    private String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 }

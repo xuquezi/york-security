@@ -17,10 +17,8 @@ public class LoginController {
     @PostMapping("/login")
     @ApiOperation(value = "登入身份验证（JWT验证）", notes = "登入身份验证")
     //AuthenticationBean
-    @ApiImplicitParam(name = "user", value = "用户实体user", required = true, dataType = "User",paramType = "body")
+    @ApiImplicitParam(name = "user", value = "用户实体user", required = true, dataType = "AuthenticationBean",paramType = "body")
     public void login(@RequestBody AuthenticationBean user) {
-        log.info("登录用户名 {}",user.getUsername());
-        log.info("登录密码 {}",user.getPassword());
         // TODO 这里面不需要写任何代码，由UserDeatilsService去处理
         //TODO 只是用于swagger页面展示api
     }
