@@ -7,4 +7,6 @@ public interface LoginService {
 
     PageInfo findLoginLogList(String loginUsername, Integer pageSize, Integer pageNum);
 
+    void deleteLoginLogById(Integer loginId);
+
 }

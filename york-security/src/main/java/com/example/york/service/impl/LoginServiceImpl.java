@@ -34,4 +34,9 @@ public class LoginServiceImpl implements LoginService {
         Integer total = loginMapper.countLoginLogList(loginUsername);
         return new PageInfo(total,list);
     }
+
+    @Override
+    public void deleteLoginLogById(Integer loginId) {
+        loginMapper.deleteLoginLogById(loginId);
+    }
 }

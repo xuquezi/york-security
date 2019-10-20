@@ -83,4 +83,13 @@ public class LogController {
         return pageResult;
     }
 
+    @DeleteMapping("/login/deleteLoginLog")
+    @SysLog
+    @ApiOperation(value="删除单条登录日志记录" ,notes="删除单条登录日志记录")
+    @ApiImplicitParam(name = "loginId", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
+    public ResponseResult deleteLoginLog(@RequestParam(name = "loginId") Integer loginId){
+        loginService.deleteLoginLogById(loginId);
+        return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+    }
+
 }

@@ -32,4 +32,9 @@
             and ll.login_username like '%${loginUsername}%'
         </if>
     </select>
+
+    <delete id="deleteLoginLogById">
+        DELETE from login_log
+        where login_serial = #{loginId,jdbcType=INTEGER}
+    </delete>
 </mapper>
