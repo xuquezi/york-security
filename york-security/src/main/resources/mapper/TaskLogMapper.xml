@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.TaskLogMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.TaskSysLog">
+        <id column="task_serial" property="taskId" jdbcType="INTEGER"></id>
+        <result column="method" property="method" jdbcType="VARCHAR"></result>
+        <result column="cron" property="cron" jdbcType="VARCHAR"></result>
+        <result column="task_describe" property="taskDescribe" jdbcType="VARCHAR"></result>
+        <result column="execution_time" property="executionTime" jdbcType="BIGINT"></result>
+        <result column="visit_time" property="visitTime" jdbcType="TIMESTAMP"></result>
+    </resultMap>
+
+    <insert id="saveTaskSysLog" parameterType="com.example.york.entity.TaskSysLog">
+        INSERT into task_log (task_serial,task_describe,method,visit_time,execution_time,cron)
+        VALUES (#{taskId},#{taskDescribe},#{method},#{visitTime},#{executionTime},#{cron})
+    </insert>
+
+</mapper>
