@@ -39,4 +39,11 @@ public class SysLogServiceImpl implements SysLogService {
     public void deleteLogById(Integer id) {
         sysLogMapper.deleteLogById(id);
     }
+
+    @Override
+    public void deleteBeforeTime(String time) {
+        Integer counts = sysLogMapper.deleteBeforeTime(time);
+
+    }
+
 }

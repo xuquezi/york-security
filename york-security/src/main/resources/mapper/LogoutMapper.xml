@@ -12,4 +12,24 @@
          INSERT INTO logout_log(logout_serial,logout_username,logout_ip,logout_time)
         VALUES (#{logoutId},#{logoutUsername},#{logoutIp},#{logoutTime})
     </insert>
+
+    <select id="selectLogoutLogList" resultMap="MyBaseResultMap">
+        SELECT ll.logout_serial,ll.logout_username,ll.logout_time,ll.logout_ip
+        FROM logout_log ll
+        WHERE 1 = 1
+        <if test="logoutUsername != null and logoutUsername!= ''" >
+            and ll.logout_username like '%${logoutUsername}%'
+        </if>
+        ORDER BY ll.logout_time DESC
+        Limit #{start},#{pageSize}
+    </select>
+
+    <select id="countLogoutLogList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM logout_log ll
+        WHERE 1 = 1
+        <if test="logoutUsername != null and logoutUsername!= ''" >
+            and ll.logout_username like '%${logoutUsername}%'
+        </if>
+    </select>
 </mapper>

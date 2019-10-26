@@ -12,4 +12,6 @@ public interface SysLogService {
 
     void deleteLogById(Integer id);
 
+    void deleteBeforeTime(String time);
+
 }

@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+//被该注解注解的方法会记录用户执行记录
 public @interface SysLog {
     String value() default "";
 }

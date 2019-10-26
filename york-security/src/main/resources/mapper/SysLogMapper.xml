@@ -49,4 +49,9 @@
         DELETE from sys_log
         where log_serial = #{id,jdbcType=INTEGER}
     </delete>
+
+    <delete id="deleteBeforeTime">
+        DELETE from sys_log
+        where visit_time &lt;= #{time}
+    </delete>
 </mapper>

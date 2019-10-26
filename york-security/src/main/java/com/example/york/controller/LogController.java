@@ -6,6 +6,7 @@ import com.example.york.entity.PageInfo;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
 import com.example.york.service.LoginService;
+import com.example.york.service.LogoutService;
 import com.example.york.service.SysLogService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,6 +23,8 @@ public class LogController {
     private SysLogService sysLogService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private LogoutService logoutService;
 
     @GetMapping("/operate/page")
     @SysLog
@@ -69,7 +72,7 @@ public class LogController {
     @SysLog
     @ApiOperation(value="分页查询登录日志信息列表" ,notes="分页查询登录日志信息列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "username", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "loginUsername", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
@@ -82,6 +85,23 @@ public class LogController {
         pageResult.setPageInfo(pageInfo);
         return pageResult;
     }
+
+
+    @GetMapping("/logout/page")
+    @SysLog
+    @ApiOperation(value="分页查询登出日志信息列表" ,notes="分页查询登出日志信息列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "logoutUsername", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
+    })
+    public PageResult findLogoutLogList(@RequestParam(name = "search",defaultValue = "")String logoutUsername, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
+        PageInfo pageInfo = logoutService.findLogoutLogList(logoutUsername, pageSize, pageNum);
+        PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
+        pageResult.setPageInfo(pageInfo);
+        return pageResult;
+    }
+
 
     @DeleteMapping("/login/deleteLoginLog")
     @SysLog

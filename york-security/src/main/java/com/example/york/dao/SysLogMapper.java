@@ -18,4 +18,6 @@ public interface SysLogMapper {
 
     Integer deleteLogById(@Param("id")Integer id);
 
+    Integer deleteBeforeTime(@Param("time") String time);
+
 }

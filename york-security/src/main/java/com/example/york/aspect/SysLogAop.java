@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -61,34 +61,36 @@ public class SysLogAop {
             if (classAnnotation != null) {
                 String[] classValue = classAnnotation.value();
                 //2.获取方法上的@RequestMapping(xxx)
-                RequestMapping methodAnnotation = method.getAnnotation(RequestMapping.class);
-                if (methodAnnotation != null) {
-                    String[] methodValue = methodAnnotation.value();
-                    url = classValue[0] + methodValue[0];
+                RequestMapping requestMethodAnnotation = method.getAnnotation(RequestMapping.class);
+                GetMapping getMethodAnnotation = method.getAnnotation(GetMapping.class);
+                PostMapping postMethodAnnotation = method.getAnnotation(PostMapping.class);
+                DeleteMapping deleteMethodAnnotation = method.getAnnotation(DeleteMapping.class);
+                PutMapping putMethodAnnotation = method.getAnnotation(PutMapping.class);
 
-                    //获取访问的ip
-                    String ip = this.getIpAddr(request);
+                String methodUrl = getUrlFromMethodAnnotation(requestMethodAnnotation,getMethodAnnotation,postMethodAnnotation,deleteMethodAnnotation,putMethodAnnotation);
 
-                    //获取当前操作的用户
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                    User userDetail = (User)authentication.getPrincipal();
-                    String username = userDetail.getUsername();
-                    log.info("操作用户名为："+username);
+                url = classValue[0] + methodUrl;
 
-                    //获取当前操作的用户
+                //获取访问的ip
+                String ip = this.getIpAddr(request);
 
-                    //将日志相关信息封装到SysLog对象
-                    SysLog sysLog = new SysLog();
-                    sysLog.setExecutionTime(time); //执行时长
-                    sysLog.setIp(ip);
-                    sysLog.setMethod("[类名] " + clazz.getName() + "[方法名] " + method.getName());
-                    sysLog.setUrl(url);
-                    sysLog.setUsername(username);
-                    sysLog.setVisitTime(visitTime);
+                //获取当前操作的用户
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                User userDetail = (User)authentication.getPrincipal();
+                String username = userDetail.getUsername();
+                log.info("操作用户名为："+username);
 
-                    //调用Service完成操作，保存sysLog
-                    sysLogService.save(sysLog);
-                }
+                //将日志相关信息封装到SysLog对象
+                SysLog sysLog = new SysLog();
+                sysLog.setExecutionTime(time); //执行时长
+                sysLog.setIp(ip);
+                sysLog.setMethod("[类名] " + clazz.getName() + "[方法名] " + method.getName());
+                sysLog.setUrl(url);
+                sysLog.setUsername(username);
+                sysLog.setVisitTime(visitTime);
+
+                //调用Service完成操作，保存sysLog
+                sysLogService.save(sysLog);
             }
         }
     }
@@ -111,6 +113,28 @@ public class SysLogAop {
             ip = request.getRemoteAddr();
         }
         return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
+    }
+
+    private String getUrlFromMethodAnnotation(RequestMapping requestMethodAnnotation,GetMapping getMethodAnnotation,PostMapping postMethodAnnotation,DeleteMapping deleteMethodAnnotation,PutMapping putMethodAnnotation){
+        String methodUrl = "";
+        if(getMethodAnnotation!= null){
+            return getMethodAnnotation.value()[0];
+        }
+        else if(postMethodAnnotation!= null){
+            return postMethodAnnotation.value()[0];
+        }
+        else if (putMethodAnnotation !=null){
+            return putMethodAnnotation.value()[0];
+        }
+        else if(deleteMethodAnnotation !=null){
+            return deleteMethodAnnotation.value()[0];
+        }
+        else if(requestMethodAnnotation !=null){
+            return requestMethodAnnotation.value()[0];
+        }
+        //方法上没有映射地址的注解返回空字符串
+        return methodUrl;
+
     }
 
 }
