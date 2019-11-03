@@ -10,9 +10,11 @@ import com.example.york.entity.User;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
 import com.example.york.entity.result.UserResult;
+import com.example.york.exception.SelfThrowException;
 import com.example.york.service.LogoutService;
 import com.example.york.service.RoleService;
 import com.example.york.service.UserService;
+import com.example.york.utils.CommonUtils;
 import com.example.york.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -60,7 +62,7 @@ public class UserController {
                 User userDetail = (User)authentication.getPrincipal();
                 if(userDetail!=null){
                     if(userDetail.getStatus()==1){
-                        throw new RuntimeException("用户已经被停用!请先启用用户!");
+                        throw new SelfThrowException("用户已经被停用!请先启用用户!");
                     }
                     ActiveUser activeUser = transferUserToActiveUser(userDetail);
                     UserResult userResult = new UserResult("初始化用户信息成功",ResponseCode.REQUEST_SUCCESS);
@@ -78,7 +80,7 @@ public class UserController {
 
         //记录登出日志start
         String token = request.getHeader(Const.HEADER_STRING);
-        String ip = getIpAddr(request);
+        String ip = CommonUtils.getIpAddr(request);
         JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
         String username = jwtTokenUtil.getUsernameFromToken(token);
         if(StringUtils.isNotEmpty(username)){
@@ -115,7 +117,7 @@ public class UserController {
     public ResponseResult update(@RequestBody User user,HttpServletRequest request) {
         if(user.getRoleArray().length < 1){
             //控制用户下必须有权限角色
-            throw new RuntimeException("用户下必须有权限角色");
+            throw new SelfThrowException("用户下必须有权限角色");
         }
         String token = request.getHeader(Const.HEADER_STRING);
         JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
@@ -138,6 +140,16 @@ public class UserController {
     public ResponseResult stopAndUseUser(@RequestParam(value = "userId") Integer userId,@RequestParam (value = "status")Integer status){
         userService.stopAndUseUser(status,userId);
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
+    }
+
+
+    @PutMapping("/activate")
+    @SysLog
+    @ApiOperation(value="根据userId激活用户", notes="根据userId激活用户")
+    @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "int",paramType = "query")
+    public ResponseResult activateUser(@RequestParam(value = "userId") Integer userId){
+        userService.activateUser(userId);
+        return new ResponseResult("激活成功",ResponseCode.REQUEST_SUCCESS);
     }
 
     @DeleteMapping("/deleteUser")
@@ -166,21 +178,5 @@ public class UserController {
         }
         return activeUser;
     }
-
-    //获取ip
-    private String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
-    }
-
 
 }

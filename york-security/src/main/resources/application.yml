@@ -14,6 +14,37 @@ server:
     min-spare-threads: 30
 
 spring:
+#redis配置
+  redis:
+  # Redis服务器地址
+    host: localhost
+  # Redis服务器连接端口
+    port: 6379
+  # Redis服务器连接密码（默认为空）
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+#activemq配置start
+#  activemq:
+    #ActiveMQ通讯地址
+#    broker-url: tcp://localhost:61616
+    #用户名
+#    user: admin
+    #密码
+#    password: admin
+    #是否启用内存模式（就是不安装MQ，项目启动时同时启动一个MQ实例）
+#    in-memory: false
+#    packages:
+      #信任所有的包
+#      trust-all: true
+#    pool:
+      #是否替换默认的连接池，使用ActiveMQ的连接池需引入的依赖
+#      enabled: false
+#activemq配置end
   datasource:
     # 使用阿里的Druid连接池
     type: com.alibaba.druid.pool.DruidDataSource
@@ -79,4 +110,7 @@ fdfs:
   thumb-image:             #缩略图生成参数
     width: 200
     height: 200
-  tracker-list: 192.168.25.133:22122           #TrackerList参数,支持多个
+  tracker-list: 192.168.25.133:22122    #TrackerList参数,支持多个
+
+accessKeyId: LTAI4FwEVizEdcUrdTFL7qqp
+accessKeySecret: 7NjQ6Tnwj6MUPtNklzTKtFU1Elak6K

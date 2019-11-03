@@ -5,6 +5,7 @@ import com.example.york.constant.ResponseCode;
 import com.example.york.entity.PageInfo;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
+import com.example.york.exception.SelfThrowException;
 import com.example.york.service.LoginService;
 import com.example.york.service.LogoutService;
 import com.example.york.service.SysLogService;
@@ -55,7 +56,7 @@ public class LogController {
             sysLogService.deleteSelected(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
         }else {
-            throw new RuntimeException("选择删除的记录数为0");
+            throw new SelfThrowException("选择删除的记录数为0");
         }
     }
 

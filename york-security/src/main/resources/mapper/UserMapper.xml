@@ -90,6 +90,12 @@
         where user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
+    <update id="activateUser">
+        UPDATE user
+        SET status = 0
+        where user_serial = #{userId,jdbcType=INTEGER}
+    </update>
+
     <update id="useUser">
         UPDATE user
         SET status = 0
@@ -101,4 +107,16 @@
         SET u.delete = 1
         where u.user_serial = #{userId,jdbcType=INTEGER}
     </update>
+
+    <select id="validateUsername" resultType="Integer">
+        SELECT count(1) from user u
+        where u.username = #{username}
+        and u.delete = 0
+    </select>
+
+    <select id="validateEmail" resultType="Integer">
+        SELECT count(1) from user u
+        where u.email = #{email}
+        and u.delete = 0
+    </select>
 </mapper>

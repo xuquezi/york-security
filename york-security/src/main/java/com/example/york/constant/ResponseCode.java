@@ -8,4 +8,5 @@ public class ResponseCode {
     public static final Integer REQUEST_FAIL = 20002;
     public static final Integer NO_AUTHORIZATION = 20003;
     public static final Integer Token_Expired = 20004;
+    public static final Integer RUNTIME_EXCEPTION = 20005;
 }

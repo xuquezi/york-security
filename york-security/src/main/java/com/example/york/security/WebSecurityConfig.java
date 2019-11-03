@@ -67,7 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //这个不加好像也可以
                 //.antMatchers("/login").permitAll()
                 //注册不进行权限验证
-                .antMatchers("/register").permitAll()
+                .antMatchers("/register/**").permitAll()
                 //swagger-ui不进行权限验证
                 // swagger start
                 .antMatchers("/swagger-ui.html").permitAll()

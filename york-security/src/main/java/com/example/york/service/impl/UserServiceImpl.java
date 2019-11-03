@@ -1,18 +1,21 @@
 package com.example.york.service.impl;
 
 
+import com.example.york.constant.Const;
 import com.example.york.dao.UserMapper;
 import com.example.york.dao.UserRoleMapper;
 import com.example.york.entity.PageInfo;
 import com.example.york.entity.User;
+import com.example.york.exception.SelfThrowException;
 import com.example.york.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.Size;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -22,7 +25,6 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
-
 
     /**
      * 通过用户名查找用户 用户名需保持唯一
@@ -69,7 +71,7 @@ public class UserServiceImpl implements UserService {
             //角色停用时应该也会判断是否有用户配置了该角色，有的话应该不让停用。
             int countUserRole = userRoleMapper.countUserRoleByUserId(userId);
             if(countUserRole <= 0){
-                throw new RuntimeException("该用户下没有角色，请先配置角色权限");
+                throw new SelfThrowException("该用户下没有角色，请先配置角色权限");
             }
             userMapper.useUser(userId,status);
 
@@ -84,5 +86,29 @@ public class UserServiceImpl implements UserService {
         //删除用户之后还要删除用户和角色关联表中的数据
         userRoleMapper.deleteRolesByUserId(userId);
     }
+
+    @Override
+    public Boolean validateUsername(String username) {
+        Integer count = userMapper.validateUsername(username);
+        if(count>0){
+            return false;
+        }
+        else return true;
+    }
+
+    @Override
+    public Boolean validateEmail(String email) {
+        Integer count = userMapper.validateEmail(email);
+        if(count>0){
+            return false;
+        }
+        else return true;
+    }
+
+    @Override
+    public void activateUser(Integer userId) {
+        userMapper.activateUser(userId);
+    }
+
 
 }

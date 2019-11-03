@@ -20,7 +20,7 @@ public class FdfsTest extends YorkApplicationTests {
 
     @Test
     public void testUpload() throws FileNotFoundException {
-        File file = new File("D:\\pictures\\img_repository\\york_vue\\avatar\\5997fedcc7bd4cffbd350b40d1b5b9824.jpg");
+        File file = new File("D:\\pictures\\img_repository\\york_vue\\avatar\\avatar.jpg");
         // 上传并且生成缩略图
         StorePath storePath = this.storageClient.uploadFile(
                 new FileInputStream(file), file.length(), "jpeg", null);

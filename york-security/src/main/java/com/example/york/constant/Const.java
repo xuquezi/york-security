@@ -6,4 +6,6 @@ public class Const {
     public static final String HEADER_STRING = "Authorization" +
             ""; // 存放Token的Header Key
     //public static final String TOKEN_PREFIX = "Bearer";
+    public static final String SIGN_NAME = "york";
+    public static final String TEMPLATE_CODE = "SMS_176940929";
 }
