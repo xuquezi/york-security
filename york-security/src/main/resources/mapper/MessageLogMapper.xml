@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.MessageLogMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.MessageLog">
+        <id column="message_serial" property="messageId" jdbcType="VARCHAR"></id>
+        <result column="content" property="content" jdbcType="VARCHAR"></result>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"></result>
+        <result column="send_flag" property="sendFlag" jdbcType="INTEGER"></result>
+        <result column="send_date" property="sendDate" jdbcType="TIMESTAMP"></result>
+    </resultMap>
+
+    <insert id="saveMessageLog" parameterType="com.example.york.entity.MessageLog">
+        INSERT INTO message_log(message_serial, content, mobile, send_flag, send_date)
+        VALUES (#{messageId},#{content},#{mobile},#{sendFlag},#{sendDate})
+    </insert>
+</mapper>
