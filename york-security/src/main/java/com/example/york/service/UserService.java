@@ -21,4 +21,8 @@ public interface UserService {
 
     void activateUser(Integer userId);
 
+    Boolean validateTel(String tel);
+
+    void saveUser(User user);
+
 }

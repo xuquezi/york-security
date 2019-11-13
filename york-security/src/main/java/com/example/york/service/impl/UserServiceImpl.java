@@ -1,7 +1,6 @@
 package com.example.york.service.impl;
 
 
-import com.example.york.constant.Const;
 import com.example.york.dao.UserMapper;
 import com.example.york.dao.UserRoleMapper;
 import com.example.york.entity.PageInfo;
@@ -12,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -108,6 +104,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public void activateUser(Integer userId) {
         userMapper.activateUser(userId);
+    }
+
+    @Override
+    public Boolean validateTel(String tel) {
+        Integer count = userMapper.validateTel(tel);
+        if(count>0){
+            return false;
+        }
+        else return true;
+    }
+
+    @Override
+    public void saveUser(User user) {
+        //插入数据返回主键
+        Integer count = userMapper.saveUser(user);
+        //System.out.println(user.getUserId());
+        //默认设置staff角色
+        //根据返回的主键默认添加一个staff角色
+        //正常不因写死，应该先查询staff角色id，再插入，这里写死，偷懒！
+        userRoleMapper.insertRoles(user.getUserId(),2);
     }
 
 

@@ -28,7 +28,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private SmsUtil smsUtil;
     @Override
-    public CommonResponse sendCode(String tel) {
+    public String sendCode(String tel) {
         try{
             //生成一个6位数的随机验证码
             String code = String.valueOf((long) (Math.random() * 1000000));
@@ -38,15 +38,20 @@ public class RegisterServiceImpl implements RegisterService {
             //使用Redis的Hash数据机构
             //保证主键唯一，使用uuid+前缀
             String redisKey = "Code"+UUID.randomUUID().toString();
-            redisTemplate.boundHashOps(redisKey).put(tel, code);
+            redisTemplate.boundValueOps(redisKey).set(code);
             //设置验证码的过期时间5分钟
-            redisTemplate.boundHashOps(redisKey).expire(5, TimeUnit.MINUTES);
+            redisTemplate.boundValueOps(redisKey).expire(5, TimeUnit.MINUTES);
 
             CommonResponse commonResponse = smsUtil.sendSms(tel, Const.TEMPLATE_CODE, Const.SIGN_NAME, jsonCode);
+            log.info(commonResponse.getData());
+            //"Code":"OK"
+            if(!commonResponse.getData().contains("OK")){
+                throw new SelfThrowException("服务器运行异常，发送验证码失败！请联系管理员！");
+            }
             //存入信息发送的日志表中start
             this.saveMessage(redisKey,tel,code);
             //存入信息发送的日志表中end
-            return commonResponse;
+            return redisKey;
         }catch (Exception e){
             log.error("系统内部异常，异常信息：", e);
             throw new SelfThrowException("服务器运行异常，发送验证码失败！请联系管理员！");

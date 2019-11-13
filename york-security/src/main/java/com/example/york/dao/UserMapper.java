@@ -45,4 +45,8 @@ public interface UserMapper {
 
     Integer activateUser(@Param("userId")Integer userId);
 
+    Integer validateTel(@Param("tel")String tel);
+
+    Integer saveUser(User user);
+
 }

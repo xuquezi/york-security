@@ -33,10 +33,15 @@ public class User implements UserDetails {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date born;
     private Integer sex;
-    private Integer delete;
+    private Integer deleteStatus;
     private List<Role> roles;
     // 用于接受前端传来的角色数组
     private Integer[] roleArray;
+
+    //接受前端验证码
+    private String code;
+    //接受前端验证码在redis存放的key
+    private String key;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

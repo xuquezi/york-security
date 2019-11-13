@@ -10,7 +10,7 @@
         <result column="create_user" property="createUser" jdbcType="VARCHAR" />
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-        <result column="delete" property="delete" jdbcType="INTEGER"></result>
+        <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
     </resultMap>
 
     <select id="getRolesByUserId" resultMap ="MyBaseResultMap">
@@ -18,13 +18,13 @@
         where ur.user_id = #{userId}
         and ur.role_id = r.role_serial
         and r.status = 0
-        and r.delete = 0
+        and r.delete_status = 0
     </select>
 
     <select id="getRoles" resultMap="MyBaseResultMap">
         SELECT r.role_serial,r.role_name
         FROM role r
-        WHERE r.delete = 0
+        WHERE r.delete_status = 0
         and r.status = 0
     </select>
 </mapper>

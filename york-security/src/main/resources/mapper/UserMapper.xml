@@ -13,7 +13,7 @@
         <result column="create_user" property="createUser" jdbcType="VARCHAR" />
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-        <result column="delete" property="delete" jdbcType="INTEGER"></result>
+        <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
         <result column="born" property="born" jdbcType="TIMESTAMP" />
         <result column="sex" property="sex" jdbcType="INTEGER" />
         <!-- 多對多的关系映射-->
@@ -26,14 +26,14 @@
             <result column="create_user" property="createUser" jdbcType="VARCHAR" />
             <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
             <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-            <result column="delete" property="delete" jdbcType="INTEGER"></result>
+            <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
         </collection>
     </resultMap>
     <!--自定义sql-->
     <select id="findByUsername" resultMap ="MyBaseResultMap">
         SELECT u.* from user u
         where u.username = #{username}
-        and u.delete = 0
+        and u.delete_status = 0
     </select>
 
     <!--只要求角色是有效的！用户是否有效，用户与角色维护的关系是否有效不限制，都用于在前端显示-->
@@ -48,12 +48,12 @@
         <if test="username != null and username!= ''" >
             and u.username like '%${username}%'
         </if>
-        and u.delete = 0
+        and u.delete_status = 0
         limit #{start},#{pageSize}) uu,role r,user_role ur
         where uu.user_serial = ur.user_id
         and r.role_serial = ur.role_id
         and r.status = 0
-        and r.delete = 0
+        and r.delete_status = 0
     </select>
 
     <select id="countUserList" resultType="Integer">
@@ -64,11 +64,11 @@
         <if test="username != null and username!= ''" >
             and uu.username like '%${username}%'
         </if>
-        and uu.delete = 0
+        and uu.delete_status = 0
         and uu.user_serial = ur.user_id
         and r.role_serial = ur.role_id
         and r.status = 0
-        and r.delete = 0
+        and r.delete_status = 0
         )
     </select>
 
@@ -104,19 +104,37 @@
 
     <update id="deleteUser">
         UPDATE user u
-        SET u.delete = 1
+        SET u.delete_status = 1
         where u.user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
     <select id="validateUsername" resultType="Integer">
         SELECT count(1) from user u
         where u.username = #{username}
-        and u.delete = 0
+        and u.delete_status = 0
     </select>
 
     <select id="validateEmail" resultType="Integer">
         SELECT count(1) from user u
         where u.email = #{email}
-        and u.delete = 0
+        and u.delete_status = 0
     </select>
+
+    <select id="validateTel" resultType="Integer">
+        SELECT count(1) from user u
+        where u.tel = #{tel}
+        and u.delete_status = 0
+    </select>
+
+    <insert id="saveUser" parameterType="com.example.york.entity.User">
+        /*往数据库插入一条数据，返回插入数据的id配置*/
+        <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" keyColumn="user_serial">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO user (username,password,avatar,email,status,
+        tel,create_time,create_user,sex,born,delete_status)
+        VALUES (#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR},
+        #{email,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{tel,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},#{createUser,jdbcType=VARCHAR},#{sex,jdbcType=INTEGER},#{born,jdbcType=TIMESTAMP},#{deleteStatus,jdbcType=INTEGER})
+    </insert>
 </mapper>

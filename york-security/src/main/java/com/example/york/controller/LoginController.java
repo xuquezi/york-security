@@ -19,7 +19,7 @@ public class LoginController {
     //AuthenticationBean
     @ApiImplicitParam(name = "user", value = "用户实体user", required = true, dataType = "AuthenticationBean",paramType = "body")
     public void login(@RequestBody AuthenticationBean user) {
-        // TODO 这里面不需要写任何代码，由UserDeatilsService去处理
-        //TODO 只是用于swagger页面展示api
+        // 这里面不需要写任何代码，由UserDeatilsService去处理
+        // 只是用于swagger页面展示api
     }
 }
