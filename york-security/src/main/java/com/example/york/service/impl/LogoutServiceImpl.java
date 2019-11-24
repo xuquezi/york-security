@@ -34,4 +34,9 @@ public class LogoutServiceImpl implements LogoutService {
         Integer total = logoutMapper.countLogoutLogList(logoutUsername);
         return new PageInfo(total,list);
     }
+
+    @Override
+    public void deleteLogoutLogById(Integer logoutId) {
+        logoutMapper.deleteLogoutLogById(logoutId);
+    }
 }

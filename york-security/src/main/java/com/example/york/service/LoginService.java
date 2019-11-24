@@ -9,4 +9,6 @@ public interface LoginService {
 
     void deleteLoginLogById(Integer loginId);
 
+    void deleteSelectedLoginLog(Integer[] ids);
+
 }

@@ -15,4 +15,7 @@ public interface LoginMapper {
     Integer countLoginLogList(@Param("loginUsername")String loginUsername);
 
     Integer deleteLoginLogById(@Param("loginId")Integer loginId);
+
+    void deleteSelectedLoginLog(Integer[] ids);
+
 }

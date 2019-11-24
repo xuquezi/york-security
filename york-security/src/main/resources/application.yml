@@ -99,9 +99,9 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
 logging:
   config: classpath:logback-spring.xml
-  # 控制台打印sql
-  level:
-    com.example.york.dao: DEBUG
+  # 控制台打印sql，已经在logback-spring.xml中配置相关
+  #level:
+  # com.example.york.dao: DEBUG
 
 #改用腾讯云的存储对象存储照片
 #fdfs配置

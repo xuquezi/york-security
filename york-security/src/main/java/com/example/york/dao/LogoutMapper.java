@@ -14,4 +14,6 @@ public interface LogoutMapper {
 
     Integer countLogoutLogList(@Param("logoutUsername")String logoutUsername);
 
+    Integer deleteLogoutLogById(@Param("logoutId")Integer logoutId);
+
 }

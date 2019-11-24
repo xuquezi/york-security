@@ -32,4 +32,9 @@
             and ll.logout_username like '%${logoutUsername}%'
         </if>
     </select>
+
+    <delete id="deleteLogoutLogById">
+        DELETE from logout_log
+        where logout_serial = #{logoutId,jdbcType=INTEGER}
+    </delete>
 </mapper>

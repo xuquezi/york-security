@@ -7,4 +7,5 @@ public interface LogoutService {
 
     PageInfo findLogoutLogList(String logoutUsername, Integer pageSize, Integer pageNum);
 
+    void deleteLogoutLogById(Integer logoutId);
 }

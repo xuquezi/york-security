@@ -113,4 +113,29 @@ public class LogController {
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
+    @DeleteMapping("/logout/deleteLogoutLog")
+    @SysLog
+    @ApiOperation(value="删除单条登出日志记录" ,notes="删除单条登出日志记录")
+    @ApiImplicitParam(name = "logoutId", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
+    public ResponseResult deleteLogoutLog(@RequestParam(name = "logoutId") Integer logoutId){
+        logoutService.deleteLogoutLogById(logoutId);
+        return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+    }
+
+    @DeleteMapping("/login/deleteSelectedLoginLog")
+    @SysLog
+    @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
+    public ResponseResult deleteSelectedLoginLog(@RequestBody Integer[] ids){
+        /*for (Integer id : ids) {
+            log.info("要删除的记录 {}",id);
+        }*/
+        if(ids.length>0){
+            loginService.deleteSelectedLoginLog(ids);
+            return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+        }else {
+            throw new SelfThrowException("选择删除的记录数为0");
+        }
+    }
+
 }

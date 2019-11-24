@@ -41,4 +41,9 @@ public class LoginServiceImpl implements LoginService {
         System.out.println(s.toString());*/
         loginMapper.deleteLoginLogById(loginId);
     }
+
+    @Override
+    public void deleteSelectedLoginLog(Integer[] ids) {
+        loginMapper.deleteSelectedLoginLog(ids);
+    }
 }

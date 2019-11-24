@@ -37,4 +37,12 @@
         DELETE from login_log
         where login_serial = #{loginId,jdbcType=INTEGER}
     </delete>
+
+    <delete id="deleteSelectedLoginLog" parameterType="Integer">
+        DELETE FROM login_log
+        WHERE login_serial in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

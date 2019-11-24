@@ -43,7 +43,6 @@ public class SysLogServiceImpl implements SysLogService {
     @Override
     public void deleteBeforeTime(String time) {
         Integer counts = sysLogMapper.deleteBeforeTime(time);
-
     }
 
 }
