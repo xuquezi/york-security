@@ -1,17 +1,7 @@
 package com.example.york;
 
-import com.github.tobato.fastdfs.domain.fdfs.StorePath;
-import com.github.tobato.fastdfs.domain.fdfs.ThumbImageConfig;
-import com.github.tobato.fastdfs.service.FastFileStorageClient;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 public class FdfsTest extends YorkApplicationTests {
-    @Autowired
+    /*@Autowired
     private FastFileStorageClient storageClient;
 
     @Autowired
@@ -28,5 +18,5 @@ public class FdfsTest extends YorkApplicationTests {
         System.out.println(storePath.getFullPath());
         // 不带分组的路径
         System.out.println(storePath.getPath());
-    }
+    }*/
 }

@@ -1,17 +1,13 @@
 package com.example.york.utils;
 
-import com.github.tobato.fastdfs.domain.fdfs.StorePath;
-import com.github.tobato.fastdfs.domain.fdfs.ThumbImageConfig;
-import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @Slf4j
+//改用了腾讯云的存储对象
 public class FastdfsClientUtil {
-    @Autowired
+    /*@Autowired
     private FastFileStorageClient storageClient;
     @Autowired
     private ThumbImageConfig thumbImageConfig;
@@ -28,5 +24,5 @@ public class FastdfsClientUtil {
         String path = storePath.getFullPath();
 
         return path;
-    }
+    }*/
 }
