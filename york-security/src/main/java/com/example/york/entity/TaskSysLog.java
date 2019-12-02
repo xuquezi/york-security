@@ -22,5 +22,7 @@ public class TaskSysLog {
     private String taskDescribe;
     //任务的cron表达式
     private String cron;
+    //任务名称
+    private String taskName;
 
 }

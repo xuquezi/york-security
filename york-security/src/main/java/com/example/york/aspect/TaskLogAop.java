@@ -1,6 +1,7 @@
 package com.example.york.aspect;
 
 import com.example.york.annotation.TaskDescribe;
+import com.example.york.annotation.TaskName;
 import com.example.york.entity.TaskSysLog;
 import com.example.york.service.TaskLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ public class TaskLogAop {
         long time = new Date().getTime() - visitTime.getTime(); //获取访问的时长
         String cron = "";
         String taskDescribe = "";
+        String taskName = "";
 
         Scheduled scheduledAnnotation = method.getAnnotation(Scheduled.class);
         if(scheduledAnnotation !=null ){
@@ -60,6 +62,12 @@ public class TaskLogAop {
             //获取task描述
             taskDescribe = taskDescribeAnnotation.value();
         }
+        TaskName taskNameAnnotation = method.getAnnotation(TaskName.class);
+        if(taskNameAnnotation != null){
+            //获取task名称
+            taskName = taskNameAnnotation.value();
+        }
+
 
         TaskSysLog taskSysLog = new TaskSysLog();
         taskSysLog.setCron(cron);
@@ -67,6 +75,7 @@ public class TaskLogAop {
         taskSysLog.setMethod("[类名] " + clazz.getName() + "[方法名] " + method.getName());
         taskSysLog.setExecutionTime(time);
         taskSysLog.setVisitTime(visitTime);
+        taskSysLog.setTaskName(taskName);
 
         taskLogService.saveTaskSysLog(taskSysLog);
 

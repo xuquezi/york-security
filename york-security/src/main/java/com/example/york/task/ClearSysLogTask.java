@@ -2,6 +2,7 @@ package com.example.york.task;
 
 import com.example.york.annotation.TaskDescribe;
 import com.example.york.annotation.TaskLog;
+import com.example.york.annotation.TaskName;
 import com.example.york.service.SysLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class ClearSysLogTask {
     @Scheduled(cron = "0 0 10 * * ?")
     //@Scheduled(cron = "*/5 * * * * ?")
     @TaskDescribe("删除昨天以及之前的操作日志")
+    @TaskName("定时删除操作日志")
     @TaskLog
     public void clearSysLogTask() {
         Calendar calendar = Calendar.getInstance();

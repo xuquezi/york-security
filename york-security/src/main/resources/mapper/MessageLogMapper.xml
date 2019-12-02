@@ -13,4 +13,29 @@
         INSERT INTO message_log(message_serial, content, mobile, send_flag, send_date)
         VALUES (#{messageId},#{content},#{mobile},#{sendFlag},#{sendDate})
     </insert>
+
+    <select id="findMessageLogList" resultMap="MyBaseResultMap">
+        SELECT ml.message_serial,ml.content,ml.mobile,ml.send_date
+        FROM message_log ml
+        WHERE 1 = 1
+        <if test="mobile != null and mobile!= ''" >
+            and ml.mobile like '%${mobile}%'
+        </if>
+        ORDER BY ml.send_date DESC
+        Limit #{start},#{pageSize}
+    </select>
+
+    <select id="countMessageLogList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM message_log ml
+        WHERE 1 = 1
+        <if test="mobile != null and mobile!= ''" >
+            and ml.mobile like '%${mobile}%'
+        </if>
+    </select>
+
+    <delete id="deleteMessageLog">
+        DELETE from message_log
+        where message_serial = #{messageId,jdbcType=VARCHAR}
+    </delete>
 </mapper>

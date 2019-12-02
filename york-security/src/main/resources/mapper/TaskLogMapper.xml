@@ -8,11 +8,36 @@
         <result column="task_describe" property="taskDescribe" jdbcType="VARCHAR"></result>
         <result column="execution_time" property="executionTime" jdbcType="BIGINT"></result>
         <result column="visit_time" property="visitTime" jdbcType="TIMESTAMP"></result>
+        <result column="task_name" property="taskName" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <insert id="saveTaskSysLog" parameterType="com.example.york.entity.TaskSysLog">
-        INSERT into task_log (task_serial,task_describe,method,visit_time,execution_time,cron)
-        VALUES (#{taskId},#{taskDescribe},#{method},#{visitTime},#{executionTime},#{cron})
+        INSERT into task_log (task_serial,task_describe,method,visit_time,execution_time,cron,task_name)
+        VALUES (#{taskId},#{taskDescribe},#{method},#{visitTime},#{executionTime},#{cron},#{taskName})
     </insert>
 
+    <select id="findTaskLogList" resultMap="MyBaseResultMap">
+        SELECT tl.cron,tl.execution_time,tl.visit_time,tl.method,tl.task_serial,tl.task_describe,tl.task_name
+        FROM task_log tl
+        WHERE 1 = 1
+        <if test="taskLogName != null and taskLogName!= ''" >
+            and tl.task_name like '%${taskLogName}%'
+        </if>
+        ORDER BY tl.visit_time DESC
+        Limit #{start},#{pageSize}
+    </select>
+
+    <select id="countTaskLogList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM task_log tl
+        WHERE 1 = 1
+        <if test="taskLogName != null and taskLogName!= ''" >
+            and tl.task_name like '%${taskLogName}%'
+        </if>
+    </select>
+
+    <delete id="deleteTaskLog">
+        DELETE from task_log
+        where task_serial = #{taskId,jdbcType=INTEGER}
+    </delete>
 </mapper>
