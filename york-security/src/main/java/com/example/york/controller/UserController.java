@@ -138,6 +138,7 @@ public class UserController {
             @ApiImplicitParam(name = "status", value = "更新状态", required = true, dataType = "int",paramType = "query")
     })
     public ResponseResult stopAndUseUser(@RequestParam(value = "userId") Integer userId,@RequestParam (value = "status")Integer status){
+        int i = 1/0;
         userService.stopAndUseUser(status,userId);
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
     }

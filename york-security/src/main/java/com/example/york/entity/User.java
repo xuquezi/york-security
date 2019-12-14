@@ -39,9 +39,9 @@ public class User implements UserDetails {
     private Integer[] roleArray;
 
     //接受前端验证码
-    private String code;
+    // private String code;
     //接受前端验证码在redis存放的key
-    private String key;
+    // private String key;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

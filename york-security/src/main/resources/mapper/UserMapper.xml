@@ -34,6 +34,7 @@
         SELECT u.* from user u
         where u.username = #{username}
         and u.delete_status = 0
+        and u.status = 0
     </select>
 
     <!--只要求角色是有效的！用户是否有效，用户与角色维护的关系是否有效不限制，都用于在前端显示-->

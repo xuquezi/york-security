@@ -35,7 +35,6 @@ public class RegisterServiceImpl implements RegisterService {
             //将string转化为json格式，code的键对应的是短信模板里面的 ${code}
             String jsonCode ="{\"code\":"+code+"}";
             //将验证码存入redis
-            //使用Redis的Hash数据机构
             //保证主键唯一，使用uuid+前缀
             String redisKey = "Code"+UUID.randomUUID().toString();
             redisTemplate.boundValueOps(redisKey).set(code);
