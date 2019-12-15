@@ -39,4 +39,9 @@ public class LogoutServiceImpl implements LogoutService {
     public void deleteLogoutLogById(Integer logoutId) {
         logoutMapper.deleteLogoutLogById(logoutId);
     }
+
+    @Override
+    public void deleteSelectedLogoutLog(Integer[] ids) {
+        logoutMapper.deleteSelectedLogoutLog(ids);
+    }
 }

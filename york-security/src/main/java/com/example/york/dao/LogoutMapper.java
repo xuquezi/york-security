@@ -16,4 +16,6 @@ public interface LogoutMapper {
 
     Integer deleteLogoutLogById(@Param("logoutId")Integer logoutId);
 
+    Integer deleteSelectedLogoutLog(Integer[] ids);
+
 }

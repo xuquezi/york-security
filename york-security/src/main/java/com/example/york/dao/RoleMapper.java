@@ -13,4 +13,12 @@ public interface RoleMapper {
 
     List<Role> getRoles();
 
+    List<Role> selectRoleList(@Param("roleName")String roleName, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
+
+    Integer countRoleList(@Param("roleName")String roleName);
+
+    Integer stopRole(@Param("roleId")Integer roleId);
+
+    Integer useRole(@Param("roleId")Integer roleId);
+
 }

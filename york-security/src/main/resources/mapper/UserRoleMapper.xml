@@ -31,4 +31,11 @@
         from york_user where delete_status = 0
         and status = 2)
     </delete>
+
+    <select id="countUserHaveThisRole" resultType="Integer">
+        SELECT COUNT(1) from  york_user yu,user_role ur
+        where yu.user_serial = ur.user_id
+        and ur.role_id = #{roleId,jdbcType=INTEGER}
+        and yu.delete_status = 0
+    </select>
 </mapper>

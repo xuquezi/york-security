@@ -13,4 +13,5 @@ public interface UserRoleMapper {
 
     int deleteNotActiveUserRole();
 
+    Integer countUserHaveThisRole(@Param("roleId")Integer roleId);
 }

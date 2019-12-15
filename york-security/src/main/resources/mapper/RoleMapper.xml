@@ -27,4 +27,34 @@
         WHERE r.delete_status = 0
         and r.status = 0
     </select>
+
+    <select id="selectRoleList" resultMap="MyBaseResultMap">
+        SELECT r.role_serial,r.role_name,r.status,r.desc,
+        r.create_time,r.create_user,r.update_time,r.update_user
+        FROM role r
+        WHERE 1 = 1
+        <if test="roleName != null and roleName!= ''" >
+            and r.role_name like '%${roleName}%'
+        </if>
+        Limit #{start},#{pageSize}
+    </select>
+
+    <select id="countRoleList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM role r
+        WHERE 1 = 1
+        <if test="roleName != null and roleName!= ''" >
+            and r.role_name like '%${roleName}%'
+        </if>
+    </select>
+
+    <update id="stopRole">
+        UPDATE role set status = 1
+        where role_serial = #{roleId,jdbcType=INTEGER}
+    </update>
+
+    <update id="useRole">
+        UPDATE role set status = 0
+        where role_serial = #{roleId,jdbcType=INTEGER}
+    </update>
 </mapper>
