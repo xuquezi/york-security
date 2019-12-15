@@ -64,8 +64,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
                 //.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()//这个不需要了
-                //这个不加好像也可以
-                //.antMatchers("/login").permitAll()
                 //注册不进行权限验证
                 .antMatchers("/register/**").permitAll()
                 //swagger-ui不进行权限验证

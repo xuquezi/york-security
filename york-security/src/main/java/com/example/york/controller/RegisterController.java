@@ -156,21 +156,32 @@ public class RegisterController {
     })
     @ApiOperation(value="注册后邮箱激活用户", notes="注册后邮箱激活用户")
     public ModelAndView activeUser(@RequestParam(name = "redisKey",required = true,defaultValue = "")String redisKey, @RequestParam(name = "code",required = true,defaultValue = "")String code,@RequestParam(name = "userId",required = true)Integer userId){
-        // log.info(redisKey);
+        log.info("用户id"+userId+"开始通过邮件激活用户！");
         ModelAndView mv = new ModelAndView();
-        //http://tieguzhengzheng.top:8088/#/500
-        if(redisTemplate.hasKey(redisKey)){
-            String redisCode = (String) redisTemplate.opsForValue().get(redisKey);
-            if(code.equals(redisCode)){
-                // 激活用户，更新用户状态为0
-                userService.activateUser(userId);
-                mv.setViewName("redirect:http://localhost:9528/#/registerActiveSuccess");
-                return mv;
-            }
+        try {
+            //http://tieguzhengzheng.top:8088/#/500
+            if(redisTemplate.hasKey(redisKey)){
+                String redisCode = (String) redisTemplate.opsForValue().get(redisKey);
+                if(code.equals(redisCode)){
+                    // 激活用户，更新用户状态为0
+                    // test:int i= 1/0;
+                    userService.activateUser(userId);
+                    log.info("用户id"+userId+"通过邮件激活用户成功！");
+                    mv.setViewName("redirect:http://localhost:9528/#/registerActiveSuccess");
+                    return mv;
+                }
 
+            }
+            log.info("用户id"+userId+"通过邮件激活用户失败，已经过了三分钟有效期！");
+            mv.setViewName("redirect:http://localhost:9528/#/registerActiveError");
+            return mv;
+        }catch (Exception e){
+            //遇到异常就直接跳转到500，而不是被全局异常处理返回json。
+            log.error("系统内部异常，异常信息：", e);
+            mv.setViewName("redirect:http://localhost:9528/#/500");
+            return mv;
         }
-        mv.setViewName("redirect:http://localhost:9528/#/registerActiveError");
-        return mv;
+
     }
 
     private void saveUser(User user,BCryptPasswordEncoder encoder){

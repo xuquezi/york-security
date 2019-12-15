@@ -49,4 +49,6 @@ public interface UserMapper {
 
     Integer saveUser(User user);
 
+    Integer deleteNotActiveUser();
+
 }

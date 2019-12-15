@@ -24,4 +24,11 @@
         and r.status = 0
         and r.delete_status = 0
     </select>
+
+    <delete id="deleteNotActiveUserRole">
+        DELETE from user_role
+        where user_id in(select user_serial
+        from york_user where delete_status = 0
+        and status = 2)
+    </delete>
 </mapper>

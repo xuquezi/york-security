@@ -126,5 +126,11 @@ public class UserServiceImpl implements UserService {
         userRoleMapper.insertRoles(user.getUserId(),2);
     }
 
+    @Override
+    public void deleteNotActiveUser() {
+        userRoleMapper.deleteNotActiveUserRole();
+        userMapper.deleteNotActiveUser();
+    }
+
 
 }

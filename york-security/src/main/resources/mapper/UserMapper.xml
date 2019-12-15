@@ -31,7 +31,7 @@
     </resultMap>
     <!--自定义sql-->
     <select id="findByUsername" resultMap ="MyBaseResultMap">
-        SELECT u.* from user u
+        SELECT u.* from york_user u
         where u.username = #{username}
         and u.delete_status = 0
         and u.status = 0
@@ -44,7 +44,7 @@
         uu.update_user,uu.update_time,uu.sex,uu.born,
         r.role_name,r.role_serial
         FROM
-        (SELECT * from user u
+        (SELECT * from york_user u
         WHERE 1 = 1
         <if test="username != null and username!= ''" >
             and u.username like '%${username}%'
@@ -59,8 +59,8 @@
 
     <select id="countUserList" resultType="Integer">
         SELECT COUNT(1)
-        FROM user u where u.username in (select DISTINCT uu.username
-        from user uu,user_role ur,role r
+        FROM york_user u where u.username in (select DISTINCT uu.username
+        from york_user uu,user_role ur,role r
         WHERE 1 = 1
         <if test="username != null and username!= ''" >
             and uu.username like '%${username}%'
@@ -74,7 +74,7 @@
     </select>
 
     <update id="updateUser" parameterType="com.example.york.entity.User">
-        UPDATE user SET
+        UPDATE york_user SET
         username =  #{username,jdbcType=VARCHAR},
         email = #{email,jdbcType=VARCHAR},
         tel = #{tel,jdbcType=VARCHAR},
@@ -86,43 +86,43 @@
     </update>
 
     <update id="stopUser">
-        UPDATE user
+        UPDATE york_user
         SET status = 1
         where user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
     <update id="activateUser">
-        UPDATE user
+        UPDATE york_user
         SET status = 0
         where user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
     <update id="useUser">
-        UPDATE user
+        UPDATE york_user
         SET status = 0
         where user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
     <update id="deleteUser">
-        UPDATE user u
+        UPDATE york_user u
         SET u.delete_status = 1
         where u.user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
     <select id="validateUsername" resultType="Integer">
-        SELECT count(1) from user u
+        SELECT count(1) from york_user u
         where u.username = #{username}
         and u.delete_status = 0
     </select>
 
     <select id="validateEmail" resultType="Integer">
-        SELECT count(1) from user u
+        SELECT count(1) from york_user u
         where u.email = #{email}
         and u.delete_status = 0
     </select>
 
     <select id="validateTel" resultType="Integer">
-        SELECT count(1) from user u
+        SELECT count(1) from york_user u
         where u.tel = #{tel}
         and u.delete_status = 0
     </select>
@@ -132,10 +132,16 @@
         <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" keyColumn="user_serial">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO user (username,password,avatar,email,status,
+        INSERT INTO york_user (username,password,avatar,email,status,
         tel,create_time,create_user,sex,born,delete_status)
         VALUES (#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR},
         #{email,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{tel,jdbcType=VARCHAR},
         #{createTime,jdbcType=TIMESTAMP},#{createUser,jdbcType=VARCHAR},#{sex,jdbcType=INTEGER},#{born,jdbcType=TIMESTAMP},#{deleteStatus,jdbcType=INTEGER})
     </insert>
+
+    <delete id="deleteNotActiveUser">
+        update york_user set delete_status = 1
+        where delete_status = 0
+        and status = 2
+    </delete>
 </mapper>
