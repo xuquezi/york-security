@@ -59,10 +59,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
         // 由于使用的是JWT，我们这里不需要csrf
         http.cors();//支持跨域
+        //默认都会产生一个hiden标签 里面有安全相关的验证 防止请求伪造 这边我们暂时不需要 可禁用掉
         http.csrf().disable()
                 // 基于token，所以不需要session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
+                .antMatchers("/service/**").permitAll()
                 //.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()//这个不需要了
                 //注册不进行权限验证
                 .antMatchers("/register/**").permitAll()

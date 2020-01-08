@@ -10,4 +10,6 @@ public interface TaskLogService {
 
     void deleteTaskLog(Integer taskId);
 
+    void deleteSelectedTaskLog(Integer[] ids);
+
 }

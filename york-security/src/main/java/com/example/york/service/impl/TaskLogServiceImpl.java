@@ -36,4 +36,9 @@ public class TaskLogServiceImpl implements TaskLogService {
     public void deleteTaskLog(Integer taskId) {
         taskLogMapper.deleteTaskLog(taskId);
     }
+
+    @Override
+    public void deleteSelectedTaskLog(Integer[] ids) {
+        taskLogMapper.deleteSelectedTaskLog(ids);
+    }
 }

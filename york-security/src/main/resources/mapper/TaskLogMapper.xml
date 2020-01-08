@@ -40,4 +40,12 @@
         DELETE from task_log
         where task_serial = #{taskId,jdbcType=INTEGER}
     </delete>
+
+    <delete id="deleteSelectedTaskLog" parameterType="Integer">
+        DELETE FROM task_log
+        WHERE task_serial in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

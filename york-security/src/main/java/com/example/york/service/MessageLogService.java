@@ -9,4 +9,7 @@ public interface MessageLogService {
     PageInfo findMessageLogList(String mobile, Integer pageSize, Integer pageNum);
 
     void deleteMessageLog(String messageId);
+
+    void deleteSelectedMessageLog(String[] ids);
+
 }

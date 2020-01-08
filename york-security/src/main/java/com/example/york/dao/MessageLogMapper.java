@@ -16,4 +16,6 @@ public interface MessageLogMapper {
 
     Integer deleteMessageLog(@Param("messageId")String messageId);
 
+    Integer deleteSelectedMessageLog(String[] ids);
+
 }

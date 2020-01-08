@@ -205,4 +205,36 @@ public class LogController {
         }
     }
 
+    @DeleteMapping("/task/deleteSelectedTaskLog")
+    @SysLog
+    @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
+    public ResponseResult deleteSelectedTaskLog(@RequestBody Integer[] ids){
+        /*for (Integer id : ids) {
+            log.info("要删除的记录 {}",id);
+        }*/
+        if(ids.length>0){
+            taskLogService.deleteSelectedTaskLog(ids);
+            return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+        }else {
+            throw new SelfThrowException("选择删除的记录数为0");
+        }
+    }
+
+    @DeleteMapping("/message/deleteSelectedMessageLog")
+    @SysLog
+    @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
+    public ResponseResult deleteSelectedMessageLog(@RequestBody String[] ids){
+        /*for (Integer id : ids) {
+            log.info("要删除的记录 {}",id);
+        }*/
+        if(ids.length>0){
+            messageLogService.deleteSelectedMessageLog(ids);
+            return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+        }else {
+            throw new SelfThrowException("选择删除的记录数为0");
+        }
+    }
+
 }

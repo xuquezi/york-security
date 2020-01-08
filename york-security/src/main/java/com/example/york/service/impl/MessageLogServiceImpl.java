@@ -35,4 +35,9 @@ public class MessageLogServiceImpl implements MessageLogService {
     public void deleteMessageLog(String messageId) {
         messageLogMapper.deleteMessageLog(messageId);
     }
+
+    @Override
+    public void deleteSelectedMessageLog(String[] ids) {
+        messageLogMapper.deleteSelectedMessageLog(ids);
+    }
 }

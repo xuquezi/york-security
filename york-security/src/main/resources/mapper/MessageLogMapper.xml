@@ -38,4 +38,12 @@
         DELETE from message_log
         where message_serial = #{messageId,jdbcType=VARCHAR}
     </delete>
+
+    <delete id="deleteSelectedMessageLog" parameterType="String">
+        DELETE FROM message_log
+        WHERE message_serial in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

@@ -16,4 +16,5 @@ public interface TaskLogMapper {
 
     Integer deleteTaskLog(@Param("taskId") Integer taskId);
 
+    Integer deleteSelectedTaskLog(Integer[] ids);
 }
