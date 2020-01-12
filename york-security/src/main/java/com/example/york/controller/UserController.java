@@ -142,16 +142,6 @@ public class UserController {
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-
-    @PutMapping("/activate")
-    @SysLog
-    @ApiOperation(value="根据userId激活用户", notes="根据userId激活用户")
-    @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "int",paramType = "query")
-    public ResponseResult activateUser(@RequestParam(value = "userId") Integer userId){
-        userService.activateUser(userId);
-        return new ResponseResult("激活成功",ResponseCode.REQUEST_SUCCESS);
-    }
-
     @DeleteMapping("/deleteUser")
     @SysLog
     @ApiOperation(value="根据userId删除用户", notes="根据userId删除用户")

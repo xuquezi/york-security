@@ -39,16 +39,4 @@ public interface UserMapper {
 
     Integer deleteUser(@Param("userId")Integer userId);
 
-    Integer validateUsername(@Param("username")String username);
-
-    Integer validateEmail(@Param("email")String email);
-
-    Integer activateUser(@Param("userId")Integer userId);
-
-    Integer validateTel(@Param("tel")String tel);
-
-    Integer saveUser(User user);
-
-    Integer deleteNotActiveUser();
-
 }

@@ -25,13 +25,6 @@
         and r.delete_status = 0
     </select>
 
-    <delete id="deleteNotActiveUserRole">
-        DELETE from user_role
-        where user_id in(select user_serial
-        from york_user where delete_status = 0
-        and status = 2)
-    </delete>
-
     <select id="countUserHaveThisRole" resultType="Integer">
         SELECT COUNT(1) from  york_user yu,user_role ur
         where yu.user_serial = ur.user_id

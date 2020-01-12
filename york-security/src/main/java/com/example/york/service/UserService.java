@@ -15,16 +15,4 @@ public interface UserService {
 
     void deleteUser(Integer userId);
 
-    Boolean validateUsername(String username);
-
-    Boolean validateEmail(String email);
-
-    void activateUser(Integer userId);
-
-    Boolean validateTel(String tel);
-
-    void saveUser(User user);
-
-    void deleteNotActiveUser();
-
 }

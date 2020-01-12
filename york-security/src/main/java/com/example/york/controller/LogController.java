@@ -26,8 +26,6 @@ public class LogController {
     private LogoutService logoutService;
     @Autowired
     private TaskLogService taskLogService;
-    @Autowired
-    private MessageLogService messageLogService;
 
     @GetMapping("/operate/page")
     @SysLog
@@ -164,30 +162,6 @@ public class LogController {
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-    @GetMapping("/message/page")
-    @SysLog
-    @ApiOperation(value="分页查询message日志信息列表" ,notes="分页查询message日志信息列表")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mobile", value = "发送号码模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
-    })
-    public PageResult findMessageLogList(@RequestParam(name = "search",defaultValue = "")String mobile, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
-        PageInfo pageInfo = messageLogService.findMessageLogList(mobile, pageSize, pageNum);
-        PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
-        pageResult.setPageInfo(pageInfo);
-        return pageResult;
-    }
-
-    @DeleteMapping("/message/deleteMessageLog")
-    @SysLog
-    @ApiOperation(value="删除单条Message日志记录" ,notes="删除单条Message日志记录")
-    @ApiImplicitParam(name = "messageId", value = "要删除的记录的主键", required = true, dataType = "String",paramType = "query")
-    public ResponseResult deleteMessageLog(@RequestParam(name = "messageId") String messageId){
-        messageLogService.deleteMessageLog(messageId);
-        return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
-    }
-
 
     @DeleteMapping("/logout/deleteSelectedLogoutLog")
     @SysLog
@@ -215,22 +189,6 @@ public class LogController {
         }*/
         if(ids.length>0){
             taskLogService.deleteSelectedTaskLog(ids);
-            return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
-        }else {
-            throw new SelfThrowException("选择删除的记录数为0");
-        }
-    }
-
-    @DeleteMapping("/message/deleteSelectedMessageLog")
-    @SysLog
-    @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
-    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
-    public ResponseResult deleteSelectedMessageLog(@RequestBody String[] ids){
-        /*for (Integer id : ids) {
-            log.info("要删除的记录 {}",id);
-        }*/
-        if(ids.length>0){
-            messageLogService.deleteSelectedMessageLog(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
         }else {
             throw new SelfThrowException("选择删除的记录数为0");

@@ -64,10 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 基于token，所以不需要session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
-                .antMatchers("/service/**").permitAll()
                 //.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()//这个不需要了
                 //注册不进行权限验证
                 .antMatchers("/register/**").permitAll()
+
                 //swagger-ui不进行权限验证
                 // swagger start
                 .antMatchers("/swagger-ui.html").permitAll()
@@ -78,6 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/configuration/ui").permitAll()
                 .antMatchers("/configuration/security").permitAll()
                 // swagger end
+
                 .anyRequest().authenticated()   // 任何请求,登录后可以访问
                 .and().formLogin()
                 // 禁用缓存

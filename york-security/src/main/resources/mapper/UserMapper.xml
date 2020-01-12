@@ -91,12 +91,6 @@
         where user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
-    <update id="activateUser">
-        UPDATE york_user
-        SET status = 0
-        where user_serial = #{userId,jdbcType=INTEGER}
-    </update>
-
     <update id="useUser">
         UPDATE york_user
         SET status = 0
@@ -109,39 +103,4 @@
         where u.user_serial = #{userId,jdbcType=INTEGER}
     </update>
 
-    <select id="validateUsername" resultType="Integer">
-        SELECT count(1) from york_user u
-        where u.username = #{username}
-        and u.delete_status = 0
-    </select>
-
-    <select id="validateEmail" resultType="Integer">
-        SELECT count(1) from york_user u
-        where u.email = #{email}
-        and u.delete_status = 0
-    </select>
-
-    <select id="validateTel" resultType="Integer">
-        SELECT count(1) from york_user u
-        where u.tel = #{tel}
-        and u.delete_status = 0
-    </select>
-
-    <insert id="saveUser" parameterType="com.example.york.entity.User">
-        /*往数据库插入一条数据，返回插入数据的id配置*/
-        <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" keyColumn="user_serial">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
-        INSERT INTO york_user (username,password,avatar,email,status,
-        tel,create_time,create_user,sex,born,delete_status)
-        VALUES (#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR},
-        #{email,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{tel,jdbcType=VARCHAR},
-        #{createTime,jdbcType=TIMESTAMP},#{createUser,jdbcType=VARCHAR},#{sex,jdbcType=INTEGER},#{born,jdbcType=TIMESTAMP},#{deleteStatus,jdbcType=INTEGER})
-    </insert>
-
-    <delete id="deleteNotActiveUser">
-        update york_user set delete_status = 1
-        where delete_status = 0
-        and status = 2
-    </delete>
 </mapper>
