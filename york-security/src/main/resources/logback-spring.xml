@@ -123,6 +123,11 @@
         <appender-ref ref="file_debug"/>
     </logger>
 
+    <!--打印activiti的sql-->
+    <logger name="org.activiti.engine.impl.persistence.entity" additivity="false" level="DEBUG">
+        <appender-ref ref="console" />
+    </logger>
+
     <root level="info">
         <!--info以上都会打印在控制台-->
         <appender-ref ref="console" />

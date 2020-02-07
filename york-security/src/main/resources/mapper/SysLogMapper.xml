@@ -50,6 +50,10 @@
         where log_serial = #{id,jdbcType=INTEGER}
     </delete>
 
+    <delete id="deleteAllOperateLog">
+        DELETE from sys_log
+    </delete>
+
     <delete id="deleteBeforeTime">
         DELETE from sys_log
         where visit_time &lt;= #{time}

@@ -27,11 +27,12 @@ public class GlobalDefaultExceptionHandler {
         return new ResponseResult("服务器运行异常,请联系管理员!", ResponseCode.RUNTIME_EXCEPTION);
     }
 
-    // 捕捉其他所有异常
+    // 捕捉所有异常，例如IOException不属于RuntimeException，在这里处理
     @ExceptionHandler(Exception.class)
-    public ResponseResult globalExceptionHandler(Exception e){
+    public ResponseResult exceptionHandler(Exception e){
         log.error("系统内部异常，异常信息：", e);
-        return new ResponseResult("系统内部异常", ResponseCode.REQUEST_FAIL);
+        //返回ResponseCode.RUNTIME_EXCEPTION20005，会导致前端跳转500页面，而不只是弹框提示
+        return new ResponseResult("服务器运行异常,请联系管理员!", ResponseCode.RUNTIME_EXCEPTION);
     }
 
 }

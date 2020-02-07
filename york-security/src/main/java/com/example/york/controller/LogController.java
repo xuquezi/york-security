@@ -31,15 +31,15 @@ public class LogController {
     @SysLog
     @ApiOperation(value="分页查询操作日志列表" ,notes="分页查询操作日志列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "username", value = "操作用户模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
+            @ApiImplicitParam(name = "search", value = "操作用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findOperateLogList(@RequestParam(name = "search",defaultValue = "")String username, @RequestParam(value = "limit",defaultValue = "10") Integer pageSize, @RequestParam(value = "page",defaultValue = "1")Integer pageNum){
-        log.info("当前页为："+ pageNum);
-        log.info("每页显示记录数："+ pageSize);
-        log.info("搜索名为："+ username);
-        PageInfo pageInfo = sysLogService.findOperateLogList(username, pageSize, pageNum);
+    public PageResult findOperateLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(value = "limit",defaultValue = "10") Integer limit, @RequestParam(value = "page",defaultValue = "1")Integer page){
+        log.info("当前页为："+ page);
+        log.info("每页显示记录数："+ limit);
+        log.info("搜索名为："+ search);
+        PageInfo pageInfo = sysLogService.findOperateLogList(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
@@ -69,19 +69,27 @@ public class LogController {
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
+    @DeleteMapping("/operate/deleteAllOperateLog")
+    @SysLog
+    @ApiOperation(value="删除所有操作记录" ,notes="删除所有操作记录")
+    public ResponseResult deleteAllOperateLog(){
+        sysLogService.deleteAllOperateLog();
+        return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+    }
+
     @GetMapping("/login/page")
     @SysLog
     @ApiOperation(value="分页查询登录日志信息列表" ,notes="分页查询登录日志信息列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUsername", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
+            @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findLoginLogList(@RequestParam(name = "search",defaultValue = "")String loginUsername, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
-        log.info("当前页为："+ pageNum);
-        log.info("每页显示记录数："+ pageSize);
-        log.info("搜索名为："+ loginUsername);
-        PageInfo pageInfo = loginService.findLoginLogList(loginUsername, pageSize, pageNum);
+    public PageResult findLoginLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        log.info("当前页为："+ page);
+        log.info("每页显示记录数："+ limit);
+        log.info("搜索名为："+ search);
+        PageInfo pageInfo = loginService.findLoginLogList(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
@@ -92,12 +100,12 @@ public class LogController {
     @SysLog
     @ApiOperation(value="分页查询登出日志信息列表" ,notes="分页查询登出日志信息列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "logoutUsername", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
+            @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findLogoutLogList(@RequestParam(name = "search",defaultValue = "")String logoutUsername, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
-        PageInfo pageInfo = logoutService.findLogoutLogList(logoutUsername, pageSize, pageNum);
+    public PageResult findLogoutLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = logoutService.findLogoutLogList(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
@@ -142,12 +150,12 @@ public class LogController {
     @SysLog
     @ApiOperation(value="分页查询任务日志信息列表" ,notes="分页查询任务日志信息列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskLogName", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum", value = "当前页", required = true, dataType = "int",paramType = "query")
+            @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findTaskLogList(@RequestParam(name = "search",defaultValue = "")String taskLogName, @RequestParam(name = "limit",defaultValue = "10") Integer pageSize, @RequestParam(name = "page",defaultValue = "1")Integer pageNum){
-        PageInfo pageInfo = taskLogService.findTaskLogList(taskLogName, pageSize, pageNum);
+    public PageResult findTaskLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = taskLogService.findTaskLogList(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;

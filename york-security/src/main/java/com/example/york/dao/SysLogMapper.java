@@ -20,4 +20,7 @@ public interface SysLogMapper {
 
     Integer deleteBeforeTime(@Param("time") String time);
 
+    Integer deleteAllOperateLog();
+
+
 }

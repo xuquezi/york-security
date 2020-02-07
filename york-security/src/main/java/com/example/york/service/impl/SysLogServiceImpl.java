@@ -45,4 +45,9 @@ public class SysLogServiceImpl implements SysLogService {
         Integer counts = sysLogMapper.deleteBeforeTime(time);
     }
 
+    @Override
+    public void deleteAllOperateLog() {
+        sysLogMapper.deleteAllOperateLog();
+    }
+
 }

@@ -14,4 +14,5 @@ public interface SysLogService {
 
     void deleteBeforeTime(String time);
 
+    void deleteAllOperateLog();
 }
