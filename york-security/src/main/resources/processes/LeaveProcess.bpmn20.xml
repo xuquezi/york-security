@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="LeaveProcess" name="LeaveProcess" isExecutable="true">
+    <startEvent id="LeaveProcessStart" name="LeaveProcessStart">
+      <extensionElements>
+        <activiti:executionListener event="start" class="com.example.york.listener.activiti.LeaveProcessStartEventListener"></activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="LeaveProcessApply" name="LeaveProcessApply" activiti:assignee="#{userId}">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.example.york.listener.activiti.LeaveProcessApplyListener"></activiti:taskListener>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-82C7F6EA-91D1-4EBB-A854-06A9965BD766" sourceRef="LeaveProcessStart" targetRef="LeaveProcessApply"></sequenceFlow>
+    <userTask id="LeaveProcessApprove" name="LeaveProcessApprove" activiti:assignee="#{userId}">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.example.york.listener.activiti.LeaveProcessApproveListener"></activiti:taskListener>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <endEvent id="LeaveProcessEnd" name="LeaveProcessEnd">
+      <extensionElements>
+        <activiti:executionListener event="start" class="com.example.york.listener.activiti.LeaveProcessEndEventListener"></activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="LeaveProcessApproveNo" name="LeaveProcessApproveNo" sourceRef="LeaveProcessApprove" targetRef="LeaveProcessApply">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{LeaveProcessApprove=="No"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="LeaveProcessApplyYes" name="LeaveProcessApplyYes" sourceRef="LeaveProcessApply" targetRef="LeaveProcessApprove">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{LeaveProcessApply=="Yes"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="LeaveProcessApplyNo" name="LeaveProcessApplyNo" sourceRef="LeaveProcessApply" targetRef="LeaveProcessEnd">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{LeaveProcessApply=="No"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="LeaveProcessApproveYes" name="LeaveProcessApproveYes" sourceRef="LeaveProcessApprove" targetRef="LeaveProcessEnd">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{LeaveProcessApprove=="Yes"}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_LeaveProcess">
+    <bpmndi:BPMNPlane bpmnElement="LeaveProcess" id="BPMNPlane_LeaveProcess">
+      <bpmndi:BPMNShape bpmnElement="LeaveProcessStart" id="BPMNShape_LeaveProcessStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LeaveProcessApply" id="BPMNShape_LeaveProcessApply">
+        <omgdc:Bounds height="80.0" width="100.0" x="330.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LeaveProcessApprove" id="BPMNShape_LeaveProcessApprove">
+        <omgdc:Bounds height="80.0" width="100.0" x="645.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LeaveProcessEnd" id="BPMNShape_LeaveProcessEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1035.0" y="164.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="LeaveProcessApplyYes" id="BPMNEdge_LeaveProcessApplyYes">
+        <omgdi:waypoint x="430.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="645.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-82C7F6EA-91D1-4EBB-A854-06A9965BD766" id="BPMNEdge_sid-82C7F6EA-91D1-4EBB-A854-06A9965BD766">
+        <omgdi:waypoint x="130.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="330.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LeaveProcessApproveNo" id="BPMNEdge_LeaveProcessApproveNo">
+        <omgdi:waypoint x="695.0" y="138.0"></omgdi:waypoint>
+        <omgdi:waypoint x="695.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="138.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LeaveProcessApproveYes" id="BPMNEdge_LeaveProcessApproveYes">
+        <omgdi:waypoint x="745.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1035.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LeaveProcessApplyNo" id="BPMNEdge_LeaveProcessApplyNo">
+        <omgdi:waypoint x="380.0" y="218.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1049.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1049.0" y="192.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
