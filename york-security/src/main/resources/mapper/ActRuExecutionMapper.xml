@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.ActRuExecutionMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.ActRuExecution">
+        <id column="executionId" property="ID_" jdbcType="VARCHAR"></id>
+        <result column="procInstId" property="PROC_INST_ID_" jdbcType="VARCHAR"></result>
+        <result column="parentId" property="PARENT_ID_" jdbcType="VARCHAR"></result>
+        <result column="procDefId" property="PROC_DEF_ID_" jdbcType="VARCHAR"></result>
+        <result column="rootProcInstId" property="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"></result>
+        <result column="startTime" property="START_TIME_" jdbcType="TIMESTAMP"></result>
+    </resultMap>
+
+    <select id="getRuntimeProcess" resultMap="MyBaseResultMap">
+        select e.PROC_INST_ID_,e.START_TIME_ from act_ru_execution e
+        where e.PROC_DEF_ID_ = #{procDefId}
+        and e.PROC_INST_ID_ = e.ID_
+    </select>
+</mapper>

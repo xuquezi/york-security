@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.LeaveApplyMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.LeaveApply">
+        <id column="leave_apply_serial" property="leaveApplyId" jdbcType="VARCHAR"></id>
+        <result column="leave_apply_username" property="leaveApplyUsername" jdbcType="VARCHAR"></result>
+        <result column="leave_apply_remark" property="leaveApplyRemark" jdbcType="VARCHAR"></result>
+        <result column="leave_apply_user_id" property="leaveApplyUserId" jdbcType="VARCHAR"></result>
+        <result column="leave_apply_days" property="leaveApplyDays" jdbcType="INTEGER"></result>
+        <result column="leave_apply_time" property="leaveApplyTime" jdbcType="TIMESTAMP"></result>
+        <result column="leave_apply_department_name" property="leaveApplyDepartmentName" jdbcType="VARCHAR"></result>
+        <result column="leave_apply_department_id" property="leaveApplyDepartmentId" jdbcType="VARCHAR"></result>
+        <result column="process_task_id" property="processTaskId" jdbcType="VARCHAR"></result>
+        <result column="process_task_instance_id" property="processTaskInstanceId" jdbcType="VARCHAR"></result>
+        <result column="process_task_definition_id" property="processTaskDefinitionId" jdbcType="VARCHAR"></result>
+    </resultMap>
+
+    <insert id="saveLeaveApply" parameterType="com.example.york.entity.LeaveApply">
+        INSERT INTO leave_apply (leave_apply_serial,leave_apply_username,leave_apply_remark,leave_apply_user_id,leave_apply_days,leave_apply_time,leave_apply_department_name,leave_apply_department_id,process_task_id,process_task_instance_id,process_task_definition_id)VALUES (#{leaveApplyId},#{leaveApplyUsername},#{leaveApplyRemark},#{leaveApplyUserId},#{leaveApplyDays},#{leaveApplyTime},#{leaveApplyDepartmentName},#{leaveApplyDepartmentId},#{processTaskId},#{processTaskInstanceId},#{processTaskDefinitionId})
+    </insert>
+
+    <select id="getLeaveApplyData" resultMap="MyBaseResultMap">
+        SELECT * from leave_apply la
+        where la.process_task_instance_id = #{processTaskInstanceId}
+        and la.process_task_definition_id = #{processTaskDefinitionId}
+    </select>
+
+    <update id="updateLeaveApply" parameterType="com.example.york.entity.LeaveApply">
+        UPDATE leave_apply SET
+        leave_apply_username = #{leaveApplyUsername},
+        leave_apply_remark = #{leaveApplyRemark},
+        leave_apply_user_id = #{leaveApplyUserId},
+        leave_apply_days = #{leaveApplyDays},
+        leave_apply_time = #{leaveApplyTime},
+        leave_apply_department_name = #{leaveApplyDepartmentName},
+        leave_apply_department_id = #{leaveApplyDepartmentId},
+        process_task_id = #{processTaskId},
+        process_task_instance_id = #{processTaskInstanceId},
+        process_task_definition_id = #{processTaskDefinitionId}
+        WHERE leave_apply_serial = #{leaveApplyId}
+    </update>
+</mapper>

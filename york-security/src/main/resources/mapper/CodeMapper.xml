@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.CodeMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.CodeLib">
+        <id column="code_serial" property="codeId" jdbcType="VARCHAR"></id>
+        <result column="code_name" property="codeName" jdbcType="VARCHAR"></result>
+        <result column="code_no" property="codeNo" jdbcType="VARCHAR"></result>
+        <result column="code_type" property="codeType" jdbcType="VARCHAR"></result>
+        <result column="code_desc" property="codeDesc" jdbcType="VARCHAR"></result>
+        <result column="attr1" property="attr1" jdbcType="VARCHAR"></result>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryDepartmentLevel" resultMap="MyBaseResultMap">
+        SELECT cl.code_serial,cl.code_no,cl.code_type,cl.code_name,cl.code_desc,cl.attr1
+        FROM code_lib cl
+        where cl.code_type=#{codeType}
+    </select>
+
+    <select id="queryParentDepartmentLevel" resultType="String">
+        select cl.attr1 from code_lib cl
+        where cl.code_type=#{codeType}
+        and cl.code_no = #{codeNo}
+    </select>
+
+</mapper>

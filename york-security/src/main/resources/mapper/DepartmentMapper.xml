@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.york.dao.DepartmentMapper">
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.Department">
+        <id column="department_serial" property="departmentSerial" jdbcType="VARCHAR"></id>
+        <result column="department_name" property="departmentName" jdbcType="VARCHAR"></result>
+        <result column="department_create_time" property="departmentCreateTime" jdbcType="TIMESTAMP" />
+        <result column="department_create_user" property="departmentCreateUser" jdbcType="VARCHAR" />
+        <result column="department_update_time" property="departmentUpdateTime" jdbcType="TIMESTAMP" />
+        <result column="department_update_user" property="departmentUpdateUser" jdbcType="VARCHAR" />
+        <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
+        <result column="department_desc" property="departmentDesc" jdbcType="VARCHAR"></result>
+        <result column="manager_user_serial" property="managerUserSerial" jdbcType="VARCHAR"></result>
+        <result column="parent_department_serial" property="parentDepartmentSerial" jdbcType="VARCHAR"></result>
+        <result column="department_level" property="departmentLevel" jdbcType="VARCHAR"></result>
+
+        <!--department下部门管理人与用户的一对一关系-->
+        <association property="userInfo" column="manager_user_serial" javaType="com.example.york.entity.UserInfo">
+            <id column="user_serial" property="userSerial" jdbcType="VARCHAR" />
+            <result column="username" property="username" jdbcType="VARCHAR" />
+            <result column="password" property="password" jdbcType="VARCHAR" />
+            <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+            <result column="email" property="email" jdbcType="VARCHAR" />
+            <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+            <result column="status" property="status" jdbcType="INTEGER" />
+            <result column="user_create_time" property="userCreateTime" jdbcType="TIMESTAMP" />
+            <result column="user_create_user" property="userCreateUser" jdbcType="VARCHAR" />
+            <result column="user_update_time" property="userUpdateTime" jdbcType="TIMESTAMP" />
+            <result column="user_update_user" property="userUpdateUser" jdbcType="VARCHAR" />
+            <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
+            <result column="born" property="born" jdbcType="TIMESTAMP" />
+            <result column="sex" property="sex" jdbcType="INTEGER" />
+        </association>
+    </resultMap>
+
+    <update id="updateDepartment" parameterType="com.example.york.entity.Department">
+        UPDATE department_info SET
+        department_name =  #{departmentName},
+        department_create_time = #{departmentCreateTime},
+        department_create_user = #{departmentCreateUser},
+        department_update_time = #{departmentUpdateTime},
+        department_desc = #{departmentDesc},
+        manager_user_serial = #{managerUserSerial},
+        parent_department_serial = #{parentDepartmentSerial},
+        department_level = #{departmentLevel}
+        WHERE department_serial = #{departmentSerial}
+    </update>
+
+    <select id="queryDepartmentListByPage" resultMap="MyBaseResultMap">
+        SELECT d.department_serial,d.department_name,d.department_desc,
+        d.department_create_time,d.department_create_user,d.department_update_time,d.department_update_user,d.department_level,
+        d.manager_user_serial,d.parent_department_serial,u.user_serial,u.username
+        FROM department_info d
+        LEFT JOIN user_info u
+        ON d.manager_user_serial = u.user_serial
+        and u.status = 0
+        and u.delete_flag = 0
+        WHERE 1 = 1
+        and d.delete_flag = 0
+        <if test="departmentName != null and departmentName!= ''" >
+            and d.department_name like '%${departmentName}%'
+        </if>
+        order by d.department_update_time DESC
+        Limit #{start},#{limit}
+    </select>
+
+    <select id="countDepartmentList" resultType="Integer">
+        SELECT COUNT(1)
+        FROM department_info d
+        WHERE 1 = 1
+        and d.delete_flag = 0
+        <if test="departmentName != null and departmentName!= ''" >
+            and d.department_name like '%${departmentName}%'
+        </if>
+    </select>
+
+    <select id="queryDepartmentByLevel" resultMap="MyBaseResultMap">
+        SELECT d.department_name,d.department_serial
+        FROM department_info d
+        where d.department_level=#{level}
+        and d.delete_flag = 0
+    </select>
+
+    <select id="getDepartmentById" resultMap="MyBaseResultMap">
+        SELECT d.*,u.user_serial,u.username
+        FROM department_info d
+        LEFT JOIN user_info u
+        ON d.manager_user_serial = u.user_serial
+        and u.status = 0
+        and u.delete_flag = 0
+        where d.department_serial = #{departmentId}
+    </select>
+
+    <insert id="createDepartment" parameterType="com.example.york.entity.Department">
+        INSERT INTO department_info (department_serial,department_name,
+        department_desc,delete_flag,department_create_user,department_create_time,parent_department_serial,department_level,department_update_time,department_update_user)
+        VALUES (#{departmentSerial},#{departmentName},#{departmentDesc},#{deleteFlag},#{departmentCreateUser},
+        #{departmentCreateTime},#{parentDepartmentSerial},#{departmentLevel},#{departmentUpdateTime},#{departmentUpdateUser})
+    </insert>
+
+    <select id="queryDepartmentByManagerId" resultMap="MyBaseResultMap">
+        SELECT d.*
+        FROM department_info d
+        where d.manager_user_serial = #{managerUserId}
+    </select>
+
+    <select id="queryDepartmentList" resultMap="MyBaseResultMap">
+        SELECT d.department_serial,d.department_name
+        FROM department_info d
+        WHERE d.delete_flag = 0
+    </select>
+
+    <select id="queryDepartmentManagerUserSerial" resultType="String">
+        SELECT di.manager_user_serial from department_info di
+        where di.department_serial = #{departmentSerial}
+    </select>
+</mapper>
