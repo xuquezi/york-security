@@ -9,7 +9,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class LoginLog {
-    private Integer loginId;
+    private String loginId;
 
     private String loginUsername;
 

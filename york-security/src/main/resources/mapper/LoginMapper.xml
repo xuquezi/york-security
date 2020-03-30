@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.york.dao.LoginMapper">
     <resultMap id="MyBaseResultMap" type="com.example.york.entity.LoginLog">
-        <id column="login_serial" property="loginId" jdbcType="INTEGER"></id>
+        <id column="login_serial" property="loginId" jdbcType="VARCHAR"></id>
         <result column="login_username" property="loginUsername" jdbcType="VARCHAR"></result>
         <result column="login_ip" property="loginIp" jdbcType="VARCHAR"></result>
         <result column="login_time" property="loginTime" jdbcType="TIMESTAMP"></result>
@@ -13,7 +13,7 @@
         VALUES (#{loginId},#{loginUsername},#{loginIp},#{loginTime})
     </insert>
 
-    <select id="selectLoginLogList" resultMap="MyBaseResultMap">
+    <select id="queryLoginLogByPage" resultMap="MyBaseResultMap">
         SELECT ll.login_serial,ll.login_username,ll.login_time,ll.login_ip
         FROM login_log ll
         WHERE 1 = 1
@@ -35,10 +35,10 @@
 
     <delete id="deleteLoginLogById">
         DELETE from login_log
-        where login_serial = #{loginId,jdbcType=INTEGER}
+        where login_serial = #{loginId}
     </delete>
 
-    <delete id="deleteSelectedLoginLog" parameterType="Integer">
+    <delete id="deleteSelectedLoginLog" parameterType="String">
         DELETE FROM login_log
         WHERE login_serial in
         <foreach item="item" collection="array" open="(" separator="," close=")">

@@ -1,60 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.york.dao.RoleMapper">
-    <resultMap id="MyBaseResultMap" type="com.example.york.entity.Role">
-        <id column="role_serial" property="roleId" jdbcType="INTEGER"></id>
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.RoleInfo">
+        <id column="role_serial" property="roleSerial" jdbcType="VARCHAR"></id>
         <result column="role_name" property="roleName" jdbcType="VARCHAR"></result>
         <result column="status" property="status" jdbcType="INTEGER"></result>
-        <result column="desc" property="desc" jdbcType="VARCHAR"></result>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
-        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-        <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
+        <result column="role_desc" property="roleDesc" jdbcType="VARCHAR"></result>
+        <result column="role_create_time" property="roleCreateTime" jdbcType="TIMESTAMP" />
+        <result column="role_create_user" property="roleCreateUser" jdbcType="VARCHAR" />
+        <result column="role_update_time" property="roleUpdateTime" jdbcType="TIMESTAMP" />
+        <result column="role_update_user" property="roleUpdateUser" jdbcType="VARCHAR" />
+        <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
     </resultMap>
 
-    <select id="getRolesByUserId" resultMap ="MyBaseResultMap">
-        SELECT r.* from role r,user_role ur
-        where ur.user_id = #{userId}
-        and ur.role_id = r.role_serial
+    <select id="queryRolesByUserId" resultMap ="MyBaseResultMap">
+        SELECT r.* from role_info r,user_role ur
+        where ur.user_serial = #{userId}
+        and ur.role_serial = r.role_serial
         and r.status = 0
-        and r.delete_status = 0
+        and r.delete_flag = 0
     </select>
 
-    <select id="getRoles" resultMap="MyBaseResultMap">
+    <select id="queryRoleList" resultMap="MyBaseResultMap">
         SELECT r.role_serial,r.role_name
-        FROM role r
-        WHERE r.delete_status = 0
+        FROM role_info r
+        WHERE r.delete_flag = 0
         and r.status = 0
     </select>
 
-    <select id="selectRoleList" resultMap="MyBaseResultMap">
-        SELECT r.role_serial,r.role_name,r.status,r.desc,
-        r.create_time,r.create_user,r.update_time,r.update_user
-        FROM role r
+    <select id="queryRoleListByPage" resultMap="MyBaseResultMap">
+        SELECT r.role_serial,r.role_name,r.status,r.role_desc,
+        r.role_create_time,r.role_create_user,r.role_update_time,r.role_update_user
+        FROM role_info r
         WHERE 1 = 1
+        and r.delete_flag = 0
         <if test="roleName != null and roleName!= ''" >
             and r.role_name like '%${roleName}%'
         </if>
+        ORDER BY r.role_update_time desc
         Limit #{start},#{pageSize}
     </select>
 
     <select id="countRoleList" resultType="Integer">
         SELECT COUNT(1)
-        FROM role r
+        FROM role_info r
         WHERE 1 = 1
+        and r.delete_flag = 0
         <if test="roleName != null and roleName!= ''" >
             and r.role_name like '%${roleName}%'
         </if>
     </select>
 
     <update id="stopRole">
-        UPDATE role set status = 1
-        where role_serial = #{roleId,jdbcType=INTEGER}
+        UPDATE role_info set status = 1
+        where role_serial = #{roleId}
     </update>
 
     <update id="useRole">
-        UPDATE role set status = 0
-        where role_serial = #{roleId,jdbcType=INTEGER}
+        UPDATE role_info set status = 0
+        where role_serial = #{roleId}
     </update>
+
+    <delete id="deleteRoleByRoleSerial">
+        update role_info set delete_flag = 1
+        where role_serial = #{roleId}
+    </delete>
+
+    <update id="updateRole" parameterType="com.example.york.entity.RoleInfo">
+        UPDATE role_info SET
+        role_name =  #{roleName},
+        role_desc = #{roleDesc},
+        role_update_user = #{roleUpdateUser},
+        role_update_time = #{roleUpdateTime}
+        WHERE role_serial = #{roleSerial}
+    </update>
+
+    <insert id="createRole" parameterType="com.example.york.entity.RoleInfo">
+        INSERT INTO role_info (role_serial,role_name,status,role_desc,role_create_time,role_create_user,role_update_time,role_update_user,delete_flag)
+        VALUES (#{roleSerial},#{roleName},#{status},#{roleDesc},#{roleCreateTime},#{roleCreateUser},#{roleUpdateTime},#{roleUpdateUser},#{deleteFlag})
+    </insert>
 </mapper>

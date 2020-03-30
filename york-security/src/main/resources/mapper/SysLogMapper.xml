@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.york.dao.SysLogMapper">
     <resultMap id="MyBaseResultMap" type="com.example.york.entity.SysLog">
-        <id column="log_serial" property="id" jdbcType="INTEGER"></id>
+        <id column="log_serial" property="id" jdbcType="VARCHAR"></id>
         <result column="visit_time" property="visitTime" jdbcType="TIMESTAMP"></result>
         <result column="username" property="username" jdbcType="VARCHAR"></result>
         <result column="ip" property="ip" jdbcType="VARCHAR"></result>
@@ -16,7 +16,7 @@
         VALUES (#{id},#{visitTime},#{username},#{ip},#{url},#{executionTime},#{method})
     </insert>
 
-    <select id="selectOperateLogList" resultMap="MyBaseResultMap">
+    <select id="queryOperateLogByPage" resultMap="MyBaseResultMap">
         SELECT sl.log_serial,sl.execution_time,sl.ip,sl.method,sl.url,
         sl.visit_time,sl.username
         FROM sys_log sl
@@ -37,7 +37,7 @@
         </if>
     </select>
 
-    <delete id="deleteSelected" parameterType="Integer">
+    <delete id="deleteSelectedOperateLog" parameterType="String">
         DELETE FROM sys_log
         WHERE log_serial in
         <foreach item="item" collection="array" open="(" separator="," close=")">
@@ -45,9 +45,9 @@
         </foreach>
     </delete>
 
-    <delete id="deleteLogById">
+    <delete id="deleteOperateLog">
         DELETE from sys_log
-        where log_serial = #{id,jdbcType=INTEGER}
+        where log_serial = #{id}
     </delete>
 
     <delete id="deleteAllOperateLog">

@@ -15,7 +15,13 @@ public class ProcessTask {
     private Date processTaskCreateTime;
 
     private String processTaskName;
-
+    // 流程实例id
     private String processTaskInstanceId;
+    //当前审批人id
+    private String processTaskAssignee;
+    //当前审批人名字
+    private String processTaskAssigneeName;
+    // 流程定义id
+    private String processTaskDefinitionId;
 
 }

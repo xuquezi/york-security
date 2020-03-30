@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.UUID;
 
 public class TimeTest extends YorkApplicationTests {
     @Test
@@ -23,8 +22,5 @@ public class TimeTest extends YorkApplicationTests {
         System.out.println(calendar.get(Calendar.MONTH));
     }
 
-    @Test
-    public void test2(){
-        System.out.println("Code"+ UUID.randomUUID().toString());
-    }
+
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class LogoutLog {
-    private Integer logoutId;
+    private String logoutId;
 
     private String logoutUsername;
 

@@ -28,6 +28,8 @@ public class ProcessDef {
 
     private String processDefTenantId;
 
+    private String processDefDescription;
+
     private ProcessDeployment processDeployment;
 
 

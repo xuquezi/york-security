@@ -1,20 +1,26 @@
 package com.example.york.service;
 
 import com.example.york.entity.PageInfo;
-import com.example.york.entity.Role;
+import com.example.york.entity.RoleInfo;
 
 import java.util.List;
 
 public interface RoleService {
 
-    List<Role> getRolesByUserId(Integer userId);
+    List<RoleInfo> queryRolesByUserId(String userSerial);
 
-    List<Role> getRoles();
+    List<RoleInfo> queryRoleList();
 
-    void deleteRolesByUserId(Integer userId);
+    void deleteRolesByUserSerial(String userSerial);
 
-    PageInfo findRolePageInfo(String roleName, Integer pageSize, Integer pageNum);
+    PageInfo queryRoleListByPage(String roleName, Integer pageSize, Integer pageNum);
 
-    void stopAndUseRole(Integer status, Integer roleId);
+    void stopOrUseRole(Integer status, String roleSerial);
+
+    void deleteRoleByRoleSerial(String roleSerial);
+
+    void updateRole(RoleInfo roleInfo);
+
+    void createRole(RoleInfo roleInfo);
 
 }

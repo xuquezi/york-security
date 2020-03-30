@@ -19,26 +19,46 @@ import java.util.List;
 public class TaskLogServiceImpl implements TaskLogService {
     @Autowired
     private TaskLogMapper taskLogMapper;
+
+    /**
+     * 保存定时任务执行日志
+     * @param taskSysLog
+     */
     @Override
     public void saveTaskSysLog(TaskSysLog taskSysLog) {
         taskLogMapper.saveTaskSysLog(taskSysLog);
     }
 
+    /**
+     * 分页查询定时任务执行日志
+     * @param taskLogName
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @Override
-    public PageInfo findTaskLogList(String taskLogName, Integer pageSize, Integer pageNum) {
+    public PageInfo queryTaskLogByPage(String taskLogName, Integer pageSize, Integer pageNum) {
         Integer start = (pageNum-1)*pageSize;
-        List<TaskSysLog> list = taskLogMapper.findTaskLogList(taskLogName, start, pageSize);
+        List<TaskSysLog> list = taskLogMapper.queryTaskLogByPage(taskLogName, start, pageSize);
         Integer total = taskLogMapper.countTaskLogList(taskLogName);
         return new PageInfo(total,list);
     }
 
+    /**
+     * 删除定时任日志（单条）
+     * @param taskId
+     */
     @Override
-    public void deleteTaskLog(Integer taskId) {
+    public void deleteTaskLog(String taskId) {
         taskLogMapper.deleteTaskLog(taskId);
     }
 
+    /**
+     * 批量删除定时任务日志
+     * @param ids
+     */
     @Override
-    public void deleteSelectedTaskLog(Integer[] ids) {
+    public void deleteSelectedTaskLog(String[] ids) {
         taskLogMapper.deleteSelectedTaskLog(ids);
     }
 }

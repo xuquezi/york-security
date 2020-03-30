@@ -4,6 +4,7 @@ import com.example.york.dao.LoginMapper;
 import com.example.york.entity.LoginLog;
 import com.example.york.entity.PageInfo;
 import com.example.york.service.LoginService;
+import com.example.york.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,29 +22,43 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public void saveLoginLog(String username, String ip) {
         LoginLog loginLog = new LoginLog();
+        loginLog.setLoginId("LL"+UUIDUtil.getUUID());
         loginLog.setLoginIp(ip);
         loginLog.setLoginUsername(username);
         loginLog.setLoginTime(new Date());
         loginMapper.saveLoginLog(loginLog);
     }
 
+    /**
+     * 分页查询登录日志
+     * @param loginUsername
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @Override
-    public PageInfo findLoginLogList(String loginUsername, Integer pageSize, Integer pageNum) {
+    public PageInfo queryLoginLogByPage(String loginUsername, Integer pageSize, Integer pageNum) {
         Integer start = (pageNum-1)*pageSize;
-        List<LoginLog> list = loginMapper.selectLoginLogList(loginUsername, start, pageSize);
+        List<LoginLog> list = loginMapper.queryLoginLogByPage(loginUsername, start, pageSize);
         Integer total = loginMapper.countLoginLogList(loginUsername);
         return new PageInfo(total,list);
     }
 
+    /**
+     * 删除单条登录日志
+     * @param loginId
+     */
     @Override
-    public void deleteLoginLogById(Integer loginId) {
-       /* String s = null;
-        System.out.println(s.toString());*/
+    public void deleteLoginLogById(String loginId) {
         loginMapper.deleteLoginLogById(loginId);
     }
 
+    /**
+     * 批量删除登录日志
+     * @param ids
+     */
     @Override
-    public void deleteSelectedLoginLog(Integer[] ids) {
+    public void deleteSelectedLoginLog(String[] ids) {
         loginMapper.deleteSelectedLoginLog(ids);
     }
 }

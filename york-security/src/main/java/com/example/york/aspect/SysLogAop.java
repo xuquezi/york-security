@@ -4,6 +4,7 @@ import com.example.york.entity.SysLog;
 import com.example.york.entity.User;
 import com.example.york.service.SysLogService;
 import com.example.york.utils.CommonUtils;
+import com.example.york.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -67,29 +68,25 @@ public class SysLogAop {
                 PostMapping postMethodAnnotation = method.getAnnotation(PostMapping.class);
                 DeleteMapping deleteMethodAnnotation = method.getAnnotation(DeleteMapping.class);
                 PutMapping putMethodAnnotation = method.getAnnotation(PutMapping.class);
-
                 String methodUrl = getUrlFromMethodAnnotation(requestMethodAnnotation,getMethodAnnotation,postMethodAnnotation,deleteMethodAnnotation,putMethodAnnotation);
-
                 url = classValue[0] + methodUrl;
-
                 //获取访问的ip
                 String ip = CommonUtils.getIpAddr(request);
-
                 //获取当前操作的用户
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 User userDetail = (User)authentication.getPrincipal();
                 String username = userDetail.getUsername();
                 log.info("操作用户名为："+username);
-
                 //将日志相关信息封装到SysLog对象
                 SysLog sysLog = new SysLog();
-                sysLog.setExecutionTime(time); //执行时长
+                sysLog.setId("SL"+UUIDUtil.getUUID());
+                //执行时长
+                sysLog.setExecutionTime(time);
                 sysLog.setIp(ip);
                 sysLog.setMethod("[类名] " + clazz.getName() + "[方法名] " + method.getName());
                 sysLog.setUrl(url);
                 sysLog.setUsername(username);
                 sysLog.setVisitTime(visitTime);
-
                 //调用Service完成操作，保存sysLog
                 sysLogService.save(sysLog);
             }

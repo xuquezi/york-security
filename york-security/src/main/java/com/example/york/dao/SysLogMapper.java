@@ -10,13 +10,13 @@ import java.util.List;
 public interface SysLogMapper {
     Integer saveSysLog(SysLog sysLog);
 
-    List<SysLog> selectOperateLogList(@Param("username") String username, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
+    List<SysLog> queryOperateLogByPage(@Param("username") String username, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
 
     Integer countOperateLogList(@Param("username")String username);
 
-    Integer deleteSelected(Integer[] ids);
+    Integer deleteSelectedOperateLog(String[] ids);
 
-    Integer deleteLogById(@Param("id")Integer id);
+    Integer deleteOperateLog(@Param("id")String id);
 
     Integer deleteBeforeTime(@Param("time") String time);
 

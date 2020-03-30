@@ -2,17 +2,33 @@ package com.example.york.service;
 
 
 import com.example.york.entity.PageInfo;
-import com.example.york.entity.User;
+import com.example.york.entity.UserInfo;
+
+import java.util.List;
 
 public interface UserService {
-    User findByUsername(String username);
+    UserInfo queryUserByUsername(String username);
 
-    PageInfo findUserPageInfo(String username, Integer pageSize, Integer pageNum);
+    PageInfo queryUserListByPage(String username, Integer pageSize, Integer pageNum);
 
-    void updateUser(User user);
+    void updateUser(UserInfo userInfo);
 
-    void stopAndUseUser(Integer status, Integer userId);
+    void stopOrUseUser(Integer status, String userSerial);
 
-    void deleteUser(Integer userId);
+    void deleteUserByUserSerial(String userSerial);
+
+    UserInfo queryUserInfoByUserSerial(String userId);
+
+    String queryUsernameByUserSerial(String userSerial);
+
+    void createUser(UserInfo userInfo);
+
+    List<UserInfo> queryAllUserList();
+
+    List<UserInfo> queryUserByDepartmentSerial(String departmentSerial);
+
+    void updateDepartmentByUserSerial(String[] users,List<String> userSerialList, String departmentSerial);
+
+    void resetDepartment(String departmentSerial);
 
 }

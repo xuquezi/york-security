@@ -1,6 +1,5 @@
 package com.example.york.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,43 +9,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
 public class User implements UserDetails {
-    private Integer userId;
-    private String username;
-    private String password;
-    private String avatar;
-    private String email;
-    private String tel;
-    private Integer status;
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
-    private Date createTime;
-    private String createUser;
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
-    private Date updateTime;
-    private String updateUser;
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
-    private Date born;
-    private Integer sex;
-    private Integer deleteStatus;
-    private List<Role> roles;
-    // 用于接受前端传来的角色数组
-    private Integer[] roleArray;
 
-    //接受前端验证码
-    // private String code;
-    //接受前端验证码在redis存放的key
-    // private String key;
+    private String userId;
+
+    private String username;
+
+    private String password;
+
+    private List<RoleInfo> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : roles) {
+        for (RoleInfo role : roles) {
             authorities.add( new SimpleGrantedAuthority( role.getRoleName() ) );
         }
         return authorities;

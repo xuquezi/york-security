@@ -10,11 +10,11 @@ import java.util.List;
 public interface TaskLogMapper {
     Integer saveTaskSysLog(TaskSysLog taskSysLog);
 
-    List<TaskSysLog> findTaskLogList(@Param("taskLogName")String taskLogName, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
+    List<TaskSysLog> queryTaskLogByPage(@Param("taskLogName")String taskLogName, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
 
     Integer countTaskLogList(@Param("taskLogName")String taskLogName);
 
-    Integer deleteTaskLog(@Param("taskId") Integer taskId);
+    Integer deleteTaskLog(@Param("taskId") String taskId);
 
-    Integer deleteSelectedTaskLog(Integer[] ids);
+    Integer deleteSelectedTaskLog(String[] ids);
 }

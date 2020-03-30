@@ -34,11 +34,11 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         log.info("用户 " + userDetails.getUsername() + " 登录成功");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //记录登入日志start
+        // 记录登入日志start
         String ip = CommonUtils.getIpAddr(request);
         // String ip = getIpAddr(request);
         loginService.saveLoginLog(userDetails.getUsername(),ip);
-        //记录登入日志end
+        // 记录登入日志end
         String token = jwtTokenUtil.generateToken(userDetails);
         renderToken(response, token);
 

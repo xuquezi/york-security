@@ -6,11 +6,11 @@ import com.example.york.entity.SysLog;
 public interface SysLogService {
     void save(SysLog sysLog);
 
-    PageInfo findOperateLogList(String username, Integer pageSize, Integer pageNum);
+    PageInfo queryOperateLogByPage(String username, Integer pageSize, Integer pageNum);
 
-    void deleteSelected(Integer[] ids);
+    void deleteSelectedOperateLog(String[] ids);
 
-    void deleteLogById(Integer id);
+    void deleteOperateLog(String id);
 
     void deleteBeforeTime(String time);
 

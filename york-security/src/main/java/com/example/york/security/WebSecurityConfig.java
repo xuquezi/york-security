@@ -67,9 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()//这个不需要了
                 //注册不进行权限验证
                 .antMatchers("/register/**").permitAll()
-
                 //swagger-ui不进行权限验证
-                // swagger start
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/images/**").permitAll()
@@ -77,15 +75,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/configuration/ui").permitAll()
                 .antMatchers("/configuration/security").permitAll()
-                // swagger end
-
-                .anyRequest().authenticated()   // 任何请求,登录后可以访问
+                // 任何请求,登录后可以访问
+                .anyRequest().authenticated()
                 .and().formLogin()
                 // 禁用缓存
                 .and().headers().cacheControl();
         // 处理认证失败和权限不足
         http.exceptionHandling().authenticationEntryPoint(entryPointUnauthorizedHandler).accessDeniedHandler(restAccessDeniedHandler);
-
         //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
         http.addFilterAt(customAuthenticationFilter(),
                 UsernamePasswordAuthenticationFilter.class);
@@ -113,7 +109,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationSuccessHandler(myAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(myAuthenticationFailureHandler);
         filter.setFilterProcessesUrl("/login");
-
         //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;

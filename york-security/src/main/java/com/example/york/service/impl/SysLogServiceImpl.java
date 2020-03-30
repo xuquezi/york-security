@@ -22,29 +22,51 @@ public class SysLogServiceImpl implements SysLogService {
         sysLogMapper.saveSysLog(sysLog);
     }
 
+    /**
+     * 分页查询操作日志
+     * @param username
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @Override
-    public PageInfo findOperateLogList(String username, Integer pageSize, Integer pageNum) {
+    public PageInfo queryOperateLogByPage(String username, Integer pageSize, Integer pageNum) {
         Integer start = (pageNum-1)*pageSize;
-        List<SysLog> list = sysLogMapper.selectOperateLogList(username, start, pageSize);
+        List<SysLog> list = sysLogMapper.queryOperateLogByPage(username, start, pageSize);
         Integer total = sysLogMapper.countOperateLogList(username);
         return new PageInfo(total,list);
     }
 
+    /**
+     * 批量删除操作日志
+     * @param ids
+     */
     @Override
-    public void deleteSelected(Integer[] ids) {
-        sysLogMapper.deleteSelected(ids);
+    public void deleteSelectedOperateLog(String[] ids) {
+        sysLogMapper.deleteSelectedOperateLog(ids);
     }
 
+    /**
+     * 删除单条操作日志
+     * @param id
+     */
     @Override
-    public void deleteLogById(Integer id) {
-        sysLogMapper.deleteLogById(id);
+    public void deleteOperateLog(String id) {
+        sysLogMapper.deleteOperateLog(id);
     }
 
+    /**
+     * 删除特定时间点之前的操作日志
+     * @param time
+     */
     @Override
     public void deleteBeforeTime(String time) {
         Integer counts = sysLogMapper.deleteBeforeTime(time);
     }
 
+    /**
+     * 删除所有操作日志
+     */
     @Override
     public void deleteAllOperateLog() {
         sysLogMapper.deleteAllOperateLog();

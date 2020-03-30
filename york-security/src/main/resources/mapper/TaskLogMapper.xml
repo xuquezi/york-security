@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.york.dao.TaskLogMapper">
     <resultMap id="MyBaseResultMap" type="com.example.york.entity.TaskSysLog">
-        <id column="task_serial" property="taskId" jdbcType="INTEGER"></id>
+        <id column="task_serial" property="taskId" jdbcType="VARCHAR"></id>
         <result column="method" property="method" jdbcType="VARCHAR"></result>
         <result column="cron" property="cron" jdbcType="VARCHAR"></result>
         <result column="task_describe" property="taskDescribe" jdbcType="VARCHAR"></result>
@@ -16,7 +16,7 @@
         VALUES (#{taskId},#{taskDescribe},#{method},#{visitTime},#{executionTime},#{cron},#{taskName})
     </insert>
 
-    <select id="findTaskLogList" resultMap="MyBaseResultMap">
+    <select id="queryTaskLogByPage" resultMap="MyBaseResultMap">
         SELECT tl.cron,tl.execution_time,tl.visit_time,tl.method,tl.task_serial,tl.task_describe,tl.task_name
         FROM task_log tl
         WHERE 1 = 1
@@ -38,10 +38,10 @@
 
     <delete id="deleteTaskLog">
         DELETE from task_log
-        where task_serial = #{taskId,jdbcType=INTEGER}
+        where task_serial = #{taskId}
     </delete>
 
-    <delete id="deleteSelectedTaskLog" parameterType="Integer">
+    <delete id="deleteSelectedTaskLog" parameterType="String">
         DELETE FROM task_log
         WHERE task_serial in
         <foreach item="item" collection="array" open="(" separator="," close=")">

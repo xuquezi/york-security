@@ -5,11 +5,12 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserRoleMapper {
-    Integer deleteRolesByUserId(@Param("userId")Integer userId);
+    Integer deleteRolesByUserSerial(@Param("userId")String userSerial);
 
-    Integer insertRoles(@Param("userId")Integer userId, @Param("roleId")Integer roleId);
+    Integer insertRoles(@Param("userId")String userSerial, @Param("roleId")String roleSerial,@Param("urSerial")String urSerial);
 
-    int countUserRoleByUserId(@Param("userId")Integer userId);
+    int countUserRoleByUserSerial(@Param("userId")String userSerial);
 
-    Integer countUserHaveThisRole(@Param("roleId")Integer roleId);
+    Integer countUserByRoleSerial(@Param("roleId")String roleSerial);
+
 }

@@ -4,6 +4,7 @@ import com.example.york.annotation.TaskDescribe;
 import com.example.york.annotation.TaskName;
 import com.example.york.entity.TaskSysLog;
 import com.example.york.service.TaskLogService;
+import com.example.york.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -70,6 +71,7 @@ public class TaskLogAop {
 
 
         TaskSysLog taskSysLog = new TaskSysLog();
+        taskSysLog.setTaskId("TL"+UUIDUtil.getUUID());
         taskSysLog.setCron(cron);
         taskSysLog.setTaskDescribe(taskDescribe);
         taskSysLog.setMethod("[类名] " + clazz.getName() + "[方法名] " + method.getName());

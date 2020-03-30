@@ -1,106 +1,184 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.york.dao.UserMapper">
-    <resultMap id="MyBaseResultMap" type="com.example.york.entity.User">
-        <id column="user_serial" property="userId" jdbcType="INTEGER" />
+    <resultMap id="MyBaseResultMap" type="com.example.york.entity.UserInfo">
+        <id column="user_serial" property="userSerial" jdbcType="VARCHAR" />
         <result column="username" property="username" jdbcType="VARCHAR" />
         <result column="password" property="password" jdbcType="VARCHAR" />
         <result column="avatar" property="avatar" jdbcType="VARCHAR" />
         <result column="email" property="email" jdbcType="VARCHAR" />
-        <result column="tel" property="tel" jdbcType="VARCHAR" />
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="INTEGER" />
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
-        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-        <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
+        <result column="user_create_time" property="userCreateTime" jdbcType="TIMESTAMP" />
+        <result column="user_create_user" property="userCreateUser" jdbcType="VARCHAR" />
+        <result column="user_update_time" property="userUpdateTime" jdbcType="TIMESTAMP" />
+        <result column="user_update_user" property="userUpdateUser" jdbcType="VARCHAR" />
+        <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
         <result column="born" property="born" jdbcType="TIMESTAMP" />
         <result column="sex" property="sex" jdbcType="INTEGER" />
+
+        <!--user同时又和department是一对一关系，一个用户一个部门，一个部门下多个用户-->
+        <association property="department" column="department_serial" javaType="com.example.york.entity.Department">
+            <id column="department_serial" property="departmentSerial" jdbcType="VARCHAR"></id>
+            <result column="department_name" property="departmentName" jdbcType="VARCHAR"></result>
+            <result column="department_create_time" property="departmentCreateTime" jdbcType="TIMESTAMP" />
+            <result column="department_create_user" property="departmentCreateUser" jdbcType="VARCHAR" />
+            <result column="department_update_time" property="departmentUpdateTime" jdbcType="TIMESTAMP" />
+            <result column="department_update_user" property="departmentUpdateUser" jdbcType="VARCHAR" />
+            <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
+            <result column="department_desc" property="departmentDesc" jdbcType="VARCHAR"></result>
+            <result column="manager_user_serial" property="managerUserSerial" jdbcType="VARCHAR"></result>
+            <result column="parent_department_serial" property="parentDepartmentSerial" jdbcType="VARCHAR"></result>
+            <result column="department_level" property="departmentLevel" jdbcType="VARCHAR"></result>
+        </association>
+
         <!-- 多對多的关系映射-->
-        <collection property="roles" ofType="com.example.york.entity.Role">
-            <id column="role_serial" property="roleId" jdbcType="INTEGER"></id>
+        <collection property="roleList" ofType="com.example.york.entity.RoleInfo">
+            <id column="role_serial" property="roleSerial" jdbcType="VARCHAR"></id>
             <result column="role_name" property="roleName" jdbcType="VARCHAR"></result>
             <result column="status" property="status" jdbcType="INTEGER"></result>
-            <result column="desc" property="desc" jdbcType="VARCHAR"></result>
-            <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-            <result column="create_user" property="createUser" jdbcType="VARCHAR" />
-            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-            <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
-            <result column="delete_status" property="deleteStatus" jdbcType="INTEGER"></result>
+            <result column="role_desc" property="roleDesc" jdbcType="VARCHAR"></result>
+            <result column="role_create_time" property="roleCreateTime" jdbcType="TIMESTAMP" />
+            <result column="role_create_user" property="roleCreateUser" jdbcType="VARCHAR" />
+            <result column="role_update_time" property="roleUpdateTime" jdbcType="TIMESTAMP" />
+            <result column="role_update_user" property="roleUpdateUser" jdbcType="VARCHAR" />
+            <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
         </collection>
     </resultMap>
-    <!--自定义sql-->
-    <select id="findByUsername" resultMap ="MyBaseResultMap">
-        SELECT u.* from york_user u
+
+    <select id="queryUserByUsername" resultMap ="MyBaseResultMap">
+        SELECT u.user_serial,u.username,u.password,u.avatar,u.email,
+        u.mobile,u.status,u.sex,u.born,u.delete_flag
+        from user_info u
         where u.username = #{username}
-        and u.delete_status = 0
+        and u.delete_flag = 0
         and u.status = 0
     </select>
 
-    <!--只要求角色是有效的！用户是否有效，用户与角色维护的关系是否有效不限制，都用于在前端显示-->
-    <select id="selectUserList" resultMap ="MyBaseResultMap">
+    <select id="queryUserInfoByUserSerial" resultMap ="MyBaseResultMap">
+        SELECT u.user_serial,u.username,u.password,u.avatar,u.email,
+        u.mobile,u.status,u.sex,u.born,u.delete_flag,
+        d.department_serial,d.department_name,d.department_level,
+        d.manager_user_serial,d.parent_department_serial
+        from user_info u
+        left join department_info d
+        on d.department_serial = u.department_serial
+        and d.delete_flag = 0
+        where u.user_serial = #{userId}
+        and u.delete_flag = 0
+        and u.status = 0
+    </select>
+
+    <select id="queryUserListByPage" resultMap ="MyBaseResultMap">
         SELECT uu.user_serial,uu.username,uu.avatar,uu.email,
-        uu.tel,uu.status,uu.create_user,uu.create_time,
-        uu.update_user,uu.update_time,uu.sex,uu.born,
-        r.role_name,r.role_serial
+        uu.mobile,uu.status,uu.user_create_user,uu.user_create_time,
+        uu.user_update_user,uu.user_update_time,uu.sex,uu.born,
+        r.role_name,r.role_serial,d.department_name,d.department_serial
         FROM
-        (SELECT * from york_user u
+        (SELECT * from user_info u
         WHERE 1 = 1
         <if test="username != null and username!= ''" >
             and u.username like '%${username}%'
         </if>
-        and u.delete_status = 0
-        limit #{start},#{pageSize}) uu,role r,user_role ur
-        where uu.user_serial = ur.user_id
-        and r.role_serial = ur.role_id
+        and u.delete_flag = 0
+        order by u.user_update_time desc
+        limit #{start},#{pageSize}) uu
+        LEFT JOIN department_info d
+        on d.department_serial = uu.department_serial
+        and d.delete_flag = 0
+        INNER JOIN user_role ur
+        on uu.user_serial = ur.user_serial
+        INNER JOIN role_info r
+        on ur.role_serial = r.role_serial
         and r.status = 0
-        and r.delete_status = 0
+        and r.delete_flag = 0
+        order by uu.user_update_time DESC
     </select>
 
     <select id="countUserList" resultType="Integer">
         SELECT COUNT(1)
-        FROM york_user u where u.username in (select DISTINCT uu.username
-        from york_user uu,user_role ur,role r
+        FROM user_info u where u.user_serial in (select DISTINCT uu.user_serial
+        from user_info uu,user_role ur,role_info r
         WHERE 1 = 1
         <if test="username != null and username!= ''" >
             and uu.username like '%${username}%'
         </if>
-        and uu.delete_status = 0
-        and uu.user_serial = ur.user_id
-        and r.role_serial = ur.role_id
+        and uu.delete_flag = 0
+        and uu.user_serial = ur.user_serial
+        and r.role_serial = ur.role_serial
         and r.status = 0
-        and r.delete_status = 0
+        and r.delete_flag = 0
         )
     </select>
 
-    <update id="updateUser" parameterType="com.example.york.entity.User">
-        UPDATE york_user SET
-        username =  #{username,jdbcType=VARCHAR},
-        email = #{email,jdbcType=VARCHAR},
-        tel = #{tel,jdbcType=VARCHAR},
-        sex = #{sex,jdbcType=INTEGER},
-        born = #{born,jdbcType=TIMESTAMP},
-        update_user = #{updateUser,jdbcType=VARCHAR},
-        update_time = #{updateTime,jdbcType=TIMESTAMP}
-        WHERE user_serial = #{userId,jdbcType=INTEGER}
-    </update>
-
     <update id="stopUser">
-        UPDATE york_user
+        UPDATE user_info
         SET status = 1
-        where user_serial = #{userId,jdbcType=INTEGER}
+        where user_serial = #{userId}
     </update>
 
     <update id="useUser">
-        UPDATE york_user
+        UPDATE user_info
         SET status = 0
-        where user_serial = #{userId,jdbcType=INTEGER}
+        where user_serial = #{userId}
     </update>
 
-    <update id="deleteUser">
-        UPDATE york_user u
-        SET u.delete_status = 1
-        where u.user_serial = #{userId,jdbcType=INTEGER}
+    <update id="updateUser" parameterType="com.example.york.entity.UserInfo">
+        UPDATE user_info SET
+        username =  #{username},
+        email = #{email},
+        mobile = #{mobile},
+        sex = #{sex},
+        born = #{born},
+        user_update_user = #{userUpdateUser},
+        user_update_time = #{userUpdateTime},
+        department_serial = #{departmentSerial}
+        WHERE user_serial = #{userSerial}
     </update>
 
+    <insert id="createUser" parameterType="com.example.york.entity.UserInfo">
+        INSERT INTO user_info (user_serial,username,password,avatar,email,status,mobile,user_create_time,user_create_user,user_update_time,user_update_user,sex,born,delete_flag,department_serial)
+        VALUES (#{userSerial},#{username},#{password},#{avatar},#{email},#{status},#{mobile},#{userCreateTime},#{userCreateUser},#{userUpdateTime},#{userUpdateUser},#{sex},#{born},#{deleteFlag},#{departmentSerial})
+    </insert>
+
+    <update id="deleteUserByUserSerial">
+        UPDATE user_info u
+        SET u.delete_flag = 1
+        where u.user_serial = #{userId}
+    </update>
+
+    <select id="queryUsernameByUserSerial" resultType="String">
+        select u.username from user_info u
+        where u.user_serial = #{userId}
+        and u.status = 0
+        and u.delete_flag = 0
+    </select>
+
+    <select id="queryAllUserList" resultMap ="MyBaseResultMap">
+        SELECT ui.* from user_info ui
+        where ui.status = 0
+        and ui.delete_flag = 0
+    </select>
+
+    <select id="queryUserByDepartmentSerial" resultMap ="MyBaseResultMap">
+        SELECT ui.username,ui.user_serial from user_info ui
+        where ui.status = 0
+        and ui.delete_flag = 0
+        and ui.department_serial = #{departmentSerial}
+    </select>
+
+    <update id="resetDepartment">
+        UPDATE user_info ui
+        set ui.department_serial = NULL
+        where ui.department_serial = #{departmentSerial}
+    </update>
+
+    <update id="updateDepartmentByUserSerial">
+        UPDATE user_info ui
+        set ui.department_serial = #{departmentSerial}
+        where ui.user_serial in
+        <foreach item="item" collection="users" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

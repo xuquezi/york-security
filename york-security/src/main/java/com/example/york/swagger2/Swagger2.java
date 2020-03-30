@@ -37,7 +37,6 @@ public class Swagger2 {
                 .build();
     }*/
 
-
     /*目前我们的swagger页面并没有让我们输入token的文本框，因此我们需要改造Swagger2Config*/
     @Bean
     public Docket createRestApi() {
@@ -55,8 +54,6 @@ public class Swagger2 {
                 .apiInfo(apiInfo());
 
     }
-
-
 
 
     //创建该Api的基本信息
@@ -80,7 +77,6 @@ public class Swagger2 {
     ApiImplicitParam：一个请求参数
     ApiImplicitParams：多个请求参数*/
 }
-
 
 /*
 paramType="body" 代表参数应该放在请求的什么地方：

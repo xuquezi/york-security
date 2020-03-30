@@ -27,45 +27,38 @@ public class LogController {
     @Autowired
     private TaskLogService taskLogService;
 
-    @GetMapping("/operate/page")
-    @SysLog
+    @GetMapping("/operate/queryOperateLogByPage")
     @ApiOperation(value="分页查询操作日志列表" ,notes="分页查询操作日志列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "search", value = "操作用户模糊查询", dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findOperateLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(value = "limit",defaultValue = "10") Integer limit, @RequestParam(value = "page",defaultValue = "1")Integer page){
-        log.info("当前页为："+ page);
-        log.info("每页显示记录数："+ limit);
-        log.info("搜索名为："+ search);
-        PageInfo pageInfo = sysLogService.findOperateLogList(search, limit, page);
+    public PageResult queryOperateLogByPage(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(value = "limit",defaultValue = "10") Integer limit, @RequestParam(value = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = sysLogService.queryOperateLogByPage(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
     }
-    @DeleteMapping("/operate/deleteSelected")
+    @DeleteMapping("/operate/deleteSelectedOperateLog")
     @SysLog
     @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
-    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
-    public ResponseResult deleteSelected(@RequestBody Integer[] ids){
-        /*for (Integer id : ids) {
-            log.info("要删除的记录 {}",id);
-        }*/
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
+    public ResponseResult deleteSelectedOperateLog(@RequestBody String[] ids){
         if(ids.length>0){
-            sysLogService.deleteSelected(ids);
+            sysLogService.deleteSelectedOperateLog(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
         }else {
             throw new SelfThrowException("选择删除的记录数为0");
         }
     }
 
-    @DeleteMapping("/operate/deleteLog")
+    @DeleteMapping("/operate/deleteOperateLog")
     @SysLog
     @ApiOperation(value="删除单条记录" ,notes="删除单条记录")
     @ApiImplicitParam(name = "id", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
-    public ResponseResult deleteLog(@RequestParam(name = "id") Integer id){
-        sysLogService.deleteLogById(id);
+    public ResponseResult deleteOperateLog(@RequestParam(name = "id") String id){
+        sysLogService.deleteOperateLog(id);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
@@ -77,35 +70,29 @@ public class LogController {
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-    @GetMapping("/login/page")
-    @SysLog
+    @GetMapping("/login/queryLoginLogByPage")
     @ApiOperation(value="分页查询登录日志信息列表" ,notes="分页查询登录日志信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findLoginLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
-        log.info("当前页为："+ page);
-        log.info("每页显示记录数："+ limit);
-        log.info("搜索名为："+ search);
-        PageInfo pageInfo = loginService.findLoginLogList(search, limit, page);
+    public PageResult queryLoginLogByPage(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = loginService.queryLoginLogByPage(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
     }
 
-
-    @GetMapping("/logout/page")
-    @SysLog
+    @GetMapping("/logout/queryLogoutLogByPage")
     @ApiOperation(value="分页查询登出日志信息列表" ,notes="分页查询登出日志信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findLogoutLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
-        PageInfo pageInfo = logoutService.findLogoutLogList(search, limit, page);
+    public PageResult queryLogoutLogByPage(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = logoutService.queryLogoutLogByPage(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
@@ -115,8 +102,8 @@ public class LogController {
     @DeleteMapping("/login/deleteLoginLog")
     @SysLog
     @ApiOperation(value="删除单条登录日志记录" ,notes="删除单条登录日志记录")
-    @ApiImplicitParam(name = "loginId", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
-    public ResponseResult deleteLoginLog(@RequestParam(name = "loginId") Integer loginId){
+    @ApiImplicitParam(name = "loginId", value = "要删除的记录的主键", required = true, dataType = "String",paramType = "query")
+    public ResponseResult deleteLoginLog(@RequestParam(name = "loginId") String loginId){
         loginService.deleteLoginLogById(loginId);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
@@ -124,8 +111,8 @@ public class LogController {
     @DeleteMapping("/logout/deleteLogoutLog")
     @SysLog
     @ApiOperation(value="删除单条登出日志记录" ,notes="删除单条登出日志记录")
-    @ApiImplicitParam(name = "logoutId", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
-    public ResponseResult deleteLogoutLog(@RequestParam(name = "logoutId") Integer logoutId){
+    @ApiImplicitParam(name = "logoutId", value = "要删除的记录的主键", required = true, dataType = "String",paramType = "query")
+    public ResponseResult deleteLogoutLog(@RequestParam(name = "logoutId") String logoutId){
         logoutService.deleteLogoutLogById(logoutId);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
@@ -133,11 +120,8 @@ public class LogController {
     @DeleteMapping("/login/deleteSelectedLoginLog")
     @SysLog
     @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
-    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
-    public ResponseResult deleteSelectedLoginLog(@RequestBody Integer[] ids){
-        /*for (Integer id : ids) {
-            log.info("要删除的记录 {}",id);
-        }*/
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
+    public ResponseResult deleteSelectedLoginLog(@RequestBody String[] ids){
         if(ids.length>0){
             loginService.deleteSelectedLoginLog(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
@@ -146,16 +130,15 @@ public class LogController {
         }
     }
 
-    @GetMapping("/task/page")
-    @SysLog
+    @GetMapping("/task/queryTaskLogByPage")
     @ApiOperation(value="分页查询任务日志信息列表" ,notes="分页查询任务日志信息列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "search", value = "登录用户模糊查询", dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult findTaskLogList(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
-        PageInfo pageInfo = taskLogService.findTaskLogList(search, limit, page);
+    public PageResult queryTaskLogByPage(@RequestParam(name = "search",defaultValue = "")String search, @RequestParam(name = "limit",defaultValue = "10") Integer limit, @RequestParam(name = "page",defaultValue = "1")Integer page){
+        PageInfo pageInfo = taskLogService.queryTaskLogByPage(search, limit, page);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
@@ -164,8 +147,8 @@ public class LogController {
     @DeleteMapping("/task/deleteTaskLog")
     @SysLog
     @ApiOperation(value="删除单条任务日志记录" ,notes="删除单条任务日志记录")
-    @ApiImplicitParam(name = "taskId", value = "要删除的记录的主键", required = true, dataType = "int",paramType = "query")
-    public ResponseResult deleteTaskLog(@RequestParam(name = "taskId") Integer taskId){
+    @ApiImplicitParam(name = "taskId", value = "要删除的记录的主键", required = true, dataType = "String",paramType = "query")
+    public ResponseResult deleteTaskLog(@RequestParam(name = "taskId") String taskId){
         taskLogService.deleteTaskLog(taskId);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
@@ -174,11 +157,8 @@ public class LogController {
     @DeleteMapping("/logout/deleteSelectedLogoutLog")
     @SysLog
     @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
-    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
-    public ResponseResult deleteSelectedLogoutLog(@RequestBody Integer[] ids){
-        /*for (Integer id : ids) {
-            log.info("要删除的记录 {}",id);
-        }*/
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
+    public ResponseResult deleteSelectedLogoutLog(@RequestBody String[] ids){
         if(ids.length>0){
             logoutService.deleteSelectedLogoutLog(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
@@ -190,11 +170,8 @@ public class LogController {
     @DeleteMapping("/task/deleteSelectedTaskLog")
     @SysLog
     @ApiOperation(value="删除选择的记录" ,notes="批量删除选择的记录")
-    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "Integer[]",paramType = "body")
-    public ResponseResult deleteSelectedTaskLog(@RequestBody Integer[] ids){
-        /*for (Integer id : ids) {
-            log.info("要删除的记录 {}",id);
-        }*/
+    @ApiImplicitParam(name = "ids", value = "选择的主键数组", required = true, dataType = "String[]",paramType = "body")
+    public ResponseResult deleteSelectedTaskLog(@RequestBody String[] ids){
         if(ids.length>0){
             taskLogService.deleteSelectedTaskLog(ids);
             return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);

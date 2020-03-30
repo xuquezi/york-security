@@ -18,8 +18,21 @@ public class LeaveApply {
     // 申请天数
     private Integer leaveApplyDays;
     // 申请用户id
-    private Integer leaveApplyUserId;
+    private String leaveApplyUserId;
     // 申请人姓名
     private String leaveApplyUsername;
+
+    // 申请人所在部门id
+    private String leaveApplyDepartmentId;
+    // 申请人所在部门名称
+    private String leaveApplyDepartmentName;
+
+    //任务id
+    private String processTaskId;
+
+    //实例id
+    private String processTaskInstanceId;
+    // 流程定义id
+    private String processTaskDefinitionId;
 
 }

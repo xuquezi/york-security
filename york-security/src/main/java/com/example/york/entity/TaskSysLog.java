@@ -17,7 +17,7 @@ public class TaskSysLog {
     // 执行方法
     private String method;
 
-    private Integer taskId;
+    private String taskId;
     //任务描述
     private String taskDescribe;
     //任务的cron表达式

@@ -5,10 +5,10 @@ import com.example.york.entity.PageInfo;
 public interface LoginService {
     void saveLoginLog(String username, String ip);
 
-    PageInfo findLoginLogList(String loginUsername, Integer pageSize, Integer pageNum);
+    PageInfo queryLoginLogByPage(String loginUsername, Integer pageSize, Integer pageNum);
 
-    void deleteLoginLogById(Integer loginId);
+    void deleteLoginLogById(String loginId);
 
-    void deleteSelectedLoginLog(Integer[] ids);
+    void deleteSelectedLoginLog(String[] ids);
 
 }

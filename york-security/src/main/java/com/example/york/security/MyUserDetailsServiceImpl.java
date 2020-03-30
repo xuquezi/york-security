@@ -1,7 +1,8 @@
 package com.example.york.security;
 
-import com.example.york.entity.Role;
+import com.example.york.entity.RoleInfo;
 import com.example.york.entity.User;
+import com.example.york.entity.UserInfo;
 import com.example.york.service.RoleService;
 import com.example.york.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,15 @@ public class MyUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("MyUserDetailsServiceImpl：用户名username {}",username);
-        User user = userService.findByUsername(username);
-        if(user == null){
-            throw new UsernameNotFoundException("用户不存在");
+        UserInfo userInfo = userService.queryUserByUsername(username);
+        if(userInfo == null){
+            throw new UsernameNotFoundException("用户不存在！");
         }
-        // log.info(user.getUserId()+"");
-        List<Role> roleList = roleService.getRolesByUserId(user.getUserId());
+        List<RoleInfo> roleList = roleService.queryRolesByUserId(userInfo.getUserSerial());
+        User user = new User();
+        user.setUsername(userInfo.getUsername());
+        user.setPassword(userInfo.getPassword());
+        user.setUserId(userInfo.getUserSerial());
         user.setRoles(roleList);
         return user;
     }

@@ -10,12 +10,12 @@ import java.util.List;
 public interface LogoutMapper {
     Integer saveLogoutLog(LogoutLog logoutLog);
 
-    List<LogoutLog> selectLogoutLogList(@Param("logoutUsername")String logoutUsername, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
+    List<LogoutLog> queryLogoutLogByPage(@Param("logoutUsername")String logoutUsername, @Param("start")Integer start, @Param("pageSize")Integer pageSize);
 
     Integer countLogoutLogList(@Param("logoutUsername")String logoutUsername);
 
-    Integer deleteLogoutLogById(@Param("logoutId")Integer logoutId);
+    Integer deleteLogoutLogById(@Param("logoutId")String logoutId);
 
-    Integer deleteSelectedLogoutLog(Integer[] ids);
+    Integer deleteSelectedLogoutLog(String[] ids);
 
 }

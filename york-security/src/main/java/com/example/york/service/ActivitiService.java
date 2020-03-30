@@ -3,7 +3,7 @@ package com.example.york.service;
 import com.example.york.entity.PageInfo;
 
 public interface ActivitiService {
-    PageInfo getProcessDefList(String search, Integer limit, Integer page);
+    PageInfo queryProcessDefListByPage(String search, Integer limit, Integer page);
 
     void deleteProcessDef(String processDefDeploymentId);
 

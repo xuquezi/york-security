@@ -24,8 +24,15 @@ public class ActivitiServiceImpl implements ActivitiService {
     @Autowired
     private RepositoryService repositoryService;
 
+    /**
+     * 分页查询流程定义列表
+     * @param search
+     * @param limit
+     * @param page
+     * @return
+     */
     @Override
-    public PageInfo getProcessDefList(String search, Integer limit, Integer page) {
+    public PageInfo queryProcessDefListByPage(String search, Integer limit, Integer page) {
         Integer start = (page-1)*limit;
         //分页查询
         List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().processDefinitionNameLike("%"+search+"%").asc().listPage(start,limit);
@@ -35,50 +42,66 @@ public class ActivitiServiceImpl implements ActivitiService {
         // processDefLog(processDefinitionList);
         // 需要转化一下，直接转json会报错！
         List<ProcessDef> list = transferProcessDefinitionList(processDefinitionList);
-
         //获取流程定义对应的部署数据存入ProcessDef内的ProcessDeployment
         list = getProcessDeployment(list);
-
         PageInfo pageInfo = new PageInfo(count,list);
         return pageInfo;
     }
 
+    /**
+     * 根据部署id删除流程定义
+     * @param processDefDeploymentId
+     */
     @Override
     public void deleteProcessDef(String processDefDeploymentId) {
         try {
             //非级联删除，如果有已经启动的流程实例，就会抛出异常
             repositoryService.deleteDeployment(processDefDeploymentId);
         }catch (Exception e){
-            e.printStackTrace();
             throw new SelfThrowException("该流程定义有已经启动的流程实例！");
         }
 
     }
 
+    /**
+     * 流程定义的部署
+     * @param processDefResourceName
+     * @param deployName
+     */
     @Override
     public void deploy(String processDefResourceName,String deployName) {
         DeploymentBuilder deployment = repositoryService.createDeployment();
         deployment.name(deployName).addClasspathResource(processDefResourceName).deploy();
     }
 
+    /**
+     * 分页查询最新的流程定义版本
+     * @param search
+     * @param limit
+     * @param page
+     * @return
+     */
     @Override
     public PageInfo getLastProcessDefList(String search, Integer limit, Integer page) {
         Integer start = (page-1)*limit;
         List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().processDefinitionNameLike("%"+search+"%").asc().listPage(start,limit);
         // 过滤最新版本的流程定义，即list中如果两条同一个key 的流程定义，只会取得最新版本的。（分页）
         Map<String ,ProcessDefinition> map = lastVersionFilter(processDefinitionList);
-        // map 数据存入List<ProcessDef>
+        // map数据存入List<ProcessDef>
         List<ProcessDef> list = mapToProcessDefinitionList(map);
 
         // 获取所有记录，过滤后获取所有最新版本的流程定义记录，让后获取总记录数
         List<ProcessDefinition> countList = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().processDefinitionNameLike("%" + search + "%").asc().list();
         Map countMap = lastVersionFilter(countList);
         Integer count = countMap.size();
-        log.info("过滤后获取所有最新版本的流程定义记录数为：" + count);
         PageInfo pageInfo =new PageInfo(count,list);
         return pageInfo;
     }
 
+    /**
+     * 根据流程部署id级联删除流程定义
+     * @param processDefDeploymentId
+     */
     @Override
     public void cascadeDeleteProcessDef(String processDefDeploymentId) {
         //级联删除，会同时删除已经开启的流程实例的相关数据
@@ -140,7 +163,11 @@ public class ActivitiServiceImpl implements ActivitiService {
         return list;
     }
 
-    //processDefinition转为processDef
+    /**
+     * processDefinition转为processDef
+     * @param processDefinition
+     * @return
+     */
     private ProcessDef  transferProcessDef(ProcessDefinition processDefinition){
         ProcessDef processDef = new ProcessDef();
         processDef.setProcessDefCategory(processDefinition.getCategory());
@@ -153,6 +180,7 @@ public class ActivitiServiceImpl implements ActivitiService {
         processDef.setProcessDefDiagramResourceName(processDefinition.getDiagramResourceName());
         processDef.setProcessDefEngineVersion(processDefinition.getEngineVersion());
         processDef.setProcessDefTenantId(processDefinition.getTenantId());
+        processDef.setProcessDefDescription(processDefinition.getDescription());
         return processDef;
     }
 }
