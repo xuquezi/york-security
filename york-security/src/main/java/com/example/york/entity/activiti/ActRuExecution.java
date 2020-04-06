@@ -1,4 +1,4 @@
-package com.example.york.entity;
+package com.example.york.entity.activiti;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

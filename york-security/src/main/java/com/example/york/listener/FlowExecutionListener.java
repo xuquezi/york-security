@@ -22,7 +22,7 @@ public abstract class FlowExecutionListener implements ExecutionListener {
      * 通用的流程启动处理类，主要用来存储FlowMain和FlowTask数据
      * @param delegateExecution
      */
-    public void normalStartEvent(DelegateExecution delegateExecution,String flowPhase) {
+    public void normalStartEvent(DelegateExecution delegateExecution,String flowPhase,String flowLastPhase) {
         //保存FlowMain
         FlowMain flowMain = new FlowMain();
         String nextUserId = (String) delegateExecution.getVariable("userId");
@@ -53,7 +53,18 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(remark)){
             flowMain.setFlowRemark(remark);
         }
+        String flowType = (String) delegateExecution.getVariable("flowType");
+        if(StringUtils.isNotEmpty(flowType)){
+            flowMain.setFlowType(flowType);
+        }
+
+        String flowOperation = (String) delegateExecution.getVariable("flowOperation");
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowMain.setFlowOperation(flowOperation);
+        }
+
         flowMain.setFlowPhase(flowPhase);
+        flowMain.setFlowLastPhase(flowLastPhase);
         flowMain.setFlowMainId("FM"+ UUIDUtil.getUUID());
         flowMain.setFlowExecuteTime(new Date());
         flowMain.setFlowOpinion("流程启动");
@@ -68,8 +79,10 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         }
         flowTask.setFlowOpinion("流程启动");
         flowTask.setFlowPhase(flowPhase);
+        flowTask.setFlowLastPhase(flowLastPhase);
         flowTask.setProcessInstanceId(delegateExecution.getProcessInstanceId());
         flowTask.setProcessDefinitionId(delegateExecution.getProcessDefinitionId());
+
         flowTask.setFlowExecuteTime(new Date());
         if(StringUtils.isNotEmpty(currentUsername)){
             flowTask.setFlowUserName(currentUsername);
@@ -83,10 +96,16 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(nextUsername)){
             flowTask.setNextUsername(nextUsername);
         }
+        if(StringUtils.isNotEmpty(flowType)){
+            flowTask.setFlowType(flowType);
+        }
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowTask.setFlowOperation(flowOperation);
+        }
         flowTaskService.saveFlowTask(flowTask);
     }
 
-    public void normalAgreeEvent(DelegateExecution delegateExecution,String flowPhase) {
+    public void normalAgreeEvent(DelegateExecution delegateExecution,String flowPhase,String flowLastPhase) {
         //更新FlowMain
         FlowMain flowMain = new FlowMain();
         String nextUserId = (String) delegateExecution.getVariable("userId");
@@ -105,6 +124,10 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(currentUsername)){
             flowMain.setFlowUserName(currentUsername);
         }
+        String flowType = (String) delegateExecution.getVariable("flowType");
+        if(StringUtils.isNotEmpty(flowType)){
+            flowMain.setFlowType(flowType);
+        }
         String applyUserId = (String) delegateExecution.getVariable("applyUserId");
         if(StringUtils.isNotEmpty(applyUserId)){
             flowMain.setFlowApplyUserId(applyUserId);
@@ -113,11 +136,16 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(applyUsername)){
             flowMain.setFlowApplyUsername(applyUsername);
         }
+        String flowOperation = (String) delegateExecution.getVariable("flowOperation");
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowMain.setFlowOperation(flowOperation);
+        }
         String remark = (String) delegateExecution.getVariable("remark");
         if(StringUtils.isNotEmpty(remark)){
             flowMain.setFlowRemark(remark);
         }
         flowMain.setFlowPhase(flowPhase);
+        flowMain.setFlowLastPhase(flowLastPhase);
         flowMain.setFlowExecuteTime(new Date());
         flowMain.setFlowOpinion("同意");
         flowMain.setProcessDefinitionId(delegateExecution.getProcessDefinitionId());
@@ -131,6 +159,7 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         }
         flowTask.setFlowOpinion("同意");
         flowTask.setFlowPhase(flowPhase);
+        flowTask.setFlowLastPhase(flowLastPhase);
         flowTask.setProcessInstanceId(delegateExecution.getProcessInstanceId());
         flowTask.setProcessDefinitionId(delegateExecution.getProcessDefinitionId());
         flowTask.setFlowExecuteTime(new Date());
@@ -146,10 +175,16 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(nextUsername)){
             flowTask.setNextUsername(nextUsername);
         }
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowTask.setFlowOperation(flowOperation);
+        }
+        if(StringUtils.isNotEmpty(flowType)){
+            flowTask.setFlowType(flowType);
+        }
         flowTaskService.saveFlowTask(flowTask);
     }
 
-    public void normalDisAgreeEvent(DelegateExecution delegateExecution,String flowPhase) {
+    public void normalDisAgreeEvent(DelegateExecution delegateExecution,String flowPhase,String flowLastPhase) {
         //更新FlowMain
         FlowMain flowMain = new FlowMain();
         String nextUserId = (String) delegateExecution.getVariable("userId");
@@ -176,11 +211,20 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         if(StringUtils.isNotEmpty(applyUsername)){
             flowMain.setFlowApplyUsername(applyUsername);
         }
+        String flowType = (String) delegateExecution.getVariable("flowType");
+        if(StringUtils.isNotEmpty(flowType)){
+            flowMain.setFlowType(flowType);
+        }
         String remark = (String) delegateExecution.getVariable("remark");
         if(StringUtils.isNotEmpty(remark)){
             flowMain.setFlowRemark(remark);
         }
+        String flowOperation = (String) delegateExecution.getVariable("flowOperation");
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowMain.setFlowOperation(flowOperation);
+        }
         flowMain.setFlowPhase(flowPhase);
+        flowMain.setFlowLastPhase(flowLastPhase);
         flowMain.setFlowExecuteTime(new Date());
         flowMain.setFlowOpinion("不同意");
         flowMain.setProcessDefinitionId(delegateExecution.getProcessDefinitionId());
@@ -194,6 +238,7 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         }
         flowTask.setFlowOpinion("不同意");
         flowTask.setFlowPhase(flowPhase);
+        flowTask.setFlowLastPhase(flowLastPhase);
         flowTask.setProcessInstanceId(delegateExecution.getProcessInstanceId());
         flowTask.setProcessDefinitionId(delegateExecution.getProcessDefinitionId());
         flowTask.setFlowExecuteTime(new Date());
@@ -208,6 +253,12 @@ public abstract class FlowExecutionListener implements ExecutionListener {
         }
         if(StringUtils.isNotEmpty(nextUsername)){
             flowTask.setNextUsername(nextUsername);
+        }
+        if(StringUtils.isNotEmpty(flowOperation)){
+            flowTask.setFlowOperation(flowOperation);
+        }
+        if(StringUtils.isNotEmpty(flowType)){
+            flowTask.setFlowType(flowType);
         }
         flowTaskService.saveFlowTask(flowTask);
     }

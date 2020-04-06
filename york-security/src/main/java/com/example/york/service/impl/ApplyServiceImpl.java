@@ -4,12 +4,9 @@ import com.example.york.constant.Const;
 import com.example.york.constant.ProcessConst;
 import com.example.york.dao.LeaveApplyMapper;
 import com.example.york.entity.*;
-import com.example.york.entity.activiti.ProcessTask;
+import com.example.york.entity.activiti.ActRuTask;
 import com.example.york.exception.SelfThrowException;
-import com.example.york.service.ApplyService;
-import com.example.york.service.DepartmentService;
-import com.example.york.service.FlowMainService;
-import com.example.york.service.UserService;
+import com.example.york.service.*;
 import com.example.york.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
@@ -44,6 +41,9 @@ public class ApplyServiceImpl implements ApplyService {
     private FlowMainService flowMainService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private FlowTaskService flowTaskService;
+
 
     /**
      * 开启流程
@@ -63,13 +63,16 @@ public class ApplyServiceImpl implements ApplyService {
         // 当前阶段操作人
         map.put("currentUserId",currentUserId);
         map.put("currentUsername",currentUserName);
+        map.put("applyUserId",currentUserId);
+        map.put("applyUsername",currentUserName);
+        map.put("flowType",processDefKey);
+        map.put("flowOperation",Const.FLOW_SUBMIT);
         // 设置参数end
         ProcessInstance pi = runtimeService.startProcessInstanceByKey(processDefKey,map);
     }
 
     /**
-     * 分页查询请假流程等待申请列表数据
-     * @param search
+     * 分页查询被退回的流程
      * @param limit
      * @param page
      * @param currentUserId
@@ -77,22 +80,65 @@ public class ApplyServiceImpl implements ApplyService {
      * @return
      */
     @Override
-    public PageInfo getLeaveWaitApplyList(String search, Integer limit, Integer page, String currentUserId,String processType) {
+    public PageInfo queryLeaveBackApplyListByPage(Integer limit, Integer page, String currentUserId, String processType) {
         Integer start = (page-1)*limit;
         List<Task> taskList = taskService.createTaskQuery()
                 .taskAssignee(currentUserId) //操作用户
-                .taskNameLike("%" + search + "%")
                 .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPLY) //阶段的key
                 .processDefinitionKey(processType) //类型
+                //为了区分被退回的申请，加入flowOperation变量，每次提交或者退回或者取消
+                //都会更新flowOperation全局变量。
+                .processVariableValueEquals("flowOperation",Const.FLOW_BACK)
                 .orderByTaskCreateTime()
                 .desc().listPage(start, limit);
         long count = taskService.createTaskQuery()
                 .taskAssignee(currentUserId)
-                .taskNameLike("%" + search + "%")
-                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPLY)
+                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPLY) //阶段的key
+                .processVariableValueEquals("flowOperation",Const.FLOW_BACK)
                 .processDefinitionKey(processType)
                 .count();
-        List<ProcessTask> processTaskList = transferTaskList(taskList);
+        List<ActRuTask> processTaskList = transferTaskList(taskList);
+        return new PageInfo(count,processTaskList);
+    }
+
+    /**
+     * 获取流程申请审批过程的步骤详情
+     * @param processDefinitionId
+     * @param processInstanceId
+     * @return
+     */
+    @Override
+    public List<ProcessFlowDetail> queryProcess(String processDefinitionId, String processInstanceId) {
+        return flowTaskService.queryProcess(processDefinitionId,processInstanceId);
+    }
+
+    /**
+     * 分页查询请假流程等待申请列表数据
+     * @param limit
+     * @param page
+     * @param currentUserId
+     * @param processType
+     * @return
+     */
+    @Override
+    public PageInfo getLeaveWaitApplyList(Integer limit, Integer page, String currentUserId,String processType) {
+        Integer start = (page-1)*limit;
+        List<Task> taskList = taskService.createTaskQuery()
+                .taskAssignee(currentUserId) //操作用户
+                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPLY) //阶段的key
+                .processDefinitionKey(processType) //类型
+                //为了区分被退回的申请，加入flowOperation变量，每次提交或者退回或者取消
+                //都会更新flowOperation全局变量。
+                .processVariableValueEquals("flowOperation",Const.FLOW_SUBMIT)
+                .orderByTaskCreateTime()
+                .desc().listPage(start, limit);
+        long count = taskService.createTaskQuery()
+                .taskAssignee(currentUserId)
+                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPLY) //阶段的key
+                .processDefinitionKey(processType)
+                .processVariableValueEquals("flowOperation",Const.FLOW_SUBMIT)
+                .count();
+        List<ActRuTask> processTaskList = transferTaskList(taskList);
         return new PageInfo(count,processTaskList);
     }
 
@@ -141,13 +187,14 @@ public class ApplyServiceImpl implements ApplyService {
         map.put("currentUsername",currentUserName);
         map.put("applyUserId",currentUserId);
         map.put("applyUsername",currentUserName);
+        map.put("flowOperation",Const.FLOW_SUBMIT);
         String remark = leaveApply.getLeaveApplyRemark();
         if(StringUtils.isNotEmpty(remark)){
             map.put("remark",remark);
         }
-        taskService.complete(leaveApply.getProcessTaskId(),map);
+        taskService.complete(leaveApply.getTaskId(),map);
         //  保存申请记录
-        LeaveApply leaveApplyData = leaveApplyMapper.getLeaveApplyData(leaveApply.getProcessTaskInstanceId(),leaveApply.getProcessTaskDefinitionId());
+        LeaveApply leaveApplyData = leaveApplyMapper.getLeaveApplyData(leaveApply.getTaskInstanceId(),leaveApply.getTaskDefinitionId());
         if(leaveApplyData!=null){
             leaveApply.setLeaveApplyId(leaveApplyData.getLeaveApplyId());
             // 已经存在的话说明之前申请过，是被退回的，直接更新不要新增。
@@ -161,10 +208,10 @@ public class ApplyServiceImpl implements ApplyService {
 
     /**
      * 取消请假流程申请
-     * @param processTaskId
+     * @param taskId
      */
     @Override
-    public void cancelProcess(String processTaskId) {
+    public void cancelProcess(String taskId) {
         // 当前阶段操作人
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userDetail = (User)authentication.getPrincipal();
@@ -173,10 +220,23 @@ public class ApplyServiceImpl implements ApplyService {
         Map<String , Object> map = new HashMap<>();
         map.put("currentUserId",currentUserId);
         map.put("currentUsername",currentUserName);
+        /**
+         * 下一阶段操作人
+         * 说明一下这里为什么要设置，原因是这里设置的都是全局变量。
+         * 如果这里不设置下一阶段的处理人，那么全局变量中的userId和username仍然是原值
+         * 导致listener中存储更新flow_task和flow_main有些问题。
+         */
+        map.put("userId",Const.CANCEL);
+        map.put("username",Const.CANCEL);
         map.put(ProcessConst.LEAVE_PROCESS_APPLY,Const.DISAGREE);
-        taskService.complete(processTaskId,map);
+        map.put("flowOperation",Const.FLOW_CANCEL);
+        taskService.complete(taskId,map);
     }
 
+    /**
+     * 请假流程审批同意
+     * @param approveResult
+     */
     @Override
     public void agreeLeaveApply (ApproveResult approveResult) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -187,7 +247,16 @@ public class ApplyServiceImpl implements ApplyService {
         // 当前阶段操作人
         map.put("currentUserId",currentUserId);
         map.put("currentUsername",currentUserName);
+        /**
+         * 下一阶段操作人
+         * 说明一下这里为什么要设置，原因是这里设置的都是全局变量。
+         * 如果这里不设置下一阶段的处理人，那么全局变量中的userId和username仍然是原值
+         * 导致listener中存储更新flow_task和flow_main有些问题。
+         */
+        map.put("userId",Const.FINISH);
+        map.put("username",Const.FINISH);
         map.put(ProcessConst.LEAVE_PROCESS_APPROVE,Const.AGREE);
+        map.put("flowOperation",Const.FLOW_FINISH);
         String approveRemark = approveResult.getApproveRemark();
         if(StringUtils.isNotEmpty(approveRemark)){
             map.put("remark",approveRemark);
@@ -195,6 +264,10 @@ public class ApplyServiceImpl implements ApplyService {
         taskService.complete(approveResult.getProcessTaskId(),map);
     }
 
+    /**
+     * 请假流程退回到申请人
+     * @param approveResult
+     */
     @Override
     public void backLeaveApply(ApproveResult approveResult) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -209,6 +282,7 @@ public class ApplyServiceImpl implements ApplyService {
         map.put("userId",approveResult.getApplyUserId());
         map.put("username",approveResult.getApplyUsername());
         map.put(ProcessConst.LEAVE_PROCESS_APPROVE,Const.DISAGREE);
+        map.put("flowOperation",Const.FLOW_BACK);
         String approveRemark = approveResult.getApproveRemark();
         if(StringUtils.isNotEmpty(approveRemark)){
             map.put("remark",approveRemark);
@@ -216,47 +290,71 @@ public class ApplyServiceImpl implements ApplyService {
         taskService.complete(approveResult.getProcessTaskId(),map);
     }
 
+    /**
+     * 分页查询被取消的流程
+     * @param limit
+     * @param page
+     * @param currentUserId
+     * @return
+     */
     @Override
-    public PageInfo getApplyingList(Integer limit, Integer page, String currentUserId) {
-        List<Task> taskList = new ArrayList<>();
+    public PageInfo queryCancelApplyListByPage(Integer limit, Integer page, String currentUserId) {
         Integer start = (page-1)*limit;
-        List<FlowMain> list = flowMainService.getApplyingProcessByUserId(currentUserId,start,limit);
-        Integer total = flowMainService.countApplyingProcessByUserId(currentUserId);
-        if(list!=null&&list.size()>0){
-            for (FlowMain flowMain : list) {
-                Task task = taskService.createTaskQuery()
-                        .processDefinitionId(flowMain.getProcessDefinitionId())
-                        .processInstanceId(flowMain.getProcessInstanceId()).singleResult();
-                taskList.add(task);
-            }
-        }
-        List<ProcessTask> processTaskList = transferTaskList(taskList);
-        return new PageInfo(total,processTaskList);
+        List<FlowMain> list = flowMainService.queryCancelApplyListByPage(currentUserId,start,limit);
+        Integer total = flowMainService.countCancelApplyList(currentUserId);
+        return new PageInfo(total,list);
     }
 
+    /**
+     * 分页查询申请中流程数据
+     * @param limit
+     * @param page
+     * @param currentUserId
+     * @return
+     */
     @Override
-    public PageInfo getLeaveWaitApproveList(String search, Integer limit, Integer page, String currentUserId, String processType) {
+    public PageInfo queryApplyingListByPage(Integer limit, Integer page, String currentUserId) {
+        Integer start = (page-1)*limit;
+        List<FlowMain> list = flowMainService.queryApplyingListByPage(currentUserId,start,limit);
+        Integer total = flowMainService.countApplyingList(currentUserId);
+        return new PageInfo(total,list);
+    }
+
+    /**
+     * 分页查询待审批流程
+     * @param limit
+     * @param page
+     * @param currentUserId
+     * @param processType
+     * @return
+     */
+    @Override
+    public PageInfo queryLeaveWaitApproveListByPage(Integer limit, Integer page, String currentUserId, String processType) {
         Integer start = (page-1)*limit;
         List<Task> taskList = taskService.createTaskQuery()
-                .taskAssignee(currentUserId + "") //操作用户
-                .taskNameLike("%" + search + "%")
+                .taskAssignee(currentUserId) //操作用户
                 .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPROVE) //阶段的key
                 .processDefinitionKey(processType) //类型
                 .orderByTaskCreateTime()
                 .desc().listPage(start, limit);
         long count = taskService.createTaskQuery()
-                .taskAssignee(currentUserId + "")
-                .taskNameLike("%" + search + "%")
+                .taskAssignee(currentUserId)
                 .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPROVE) //阶段的key
                 .processDefinitionKey(processType)
                 .count();
-        List<ProcessTask> processTaskList = transferTaskList(taskList);
+        List<ActRuTask> processTaskList = transferTaskList(taskList);
         return new PageInfo(count,processTaskList);
     }
 
+    /**
+     * 获取申请的数据
+     * @param taskInstanceId
+     * @param taskDefinitionId
+     * @return
+     */
     @Override
-    public LeaveApply getLeaveApplyData(String processTaskInstanceId, String processTaskDefinitionId) {
-        return leaveApplyMapper.getLeaveApplyData(processTaskInstanceId,processTaskDefinitionId);
+    public LeaveApply getLeaveApplyData(String taskInstanceId, String taskDefinitionId) {
+        return leaveApplyMapper.getLeaveApplyData(taskInstanceId,taskDefinitionId);
     }
 
 
@@ -285,25 +383,27 @@ public class ApplyServiceImpl implements ApplyService {
      * @param taskList
      * @return
      */
-    private List<ProcessTask> transferTaskList(List<Task> taskList){
-        List<ProcessTask> list = new ArrayList<>();
+    private List<ActRuTask> transferTaskList(List<Task> taskList){
+        List<ActRuTask> list = new ArrayList<>();
         for (Task task : taskList) {
-            ProcessTask processTask = new ProcessTask();
-            processTask.setProcessTaskDefinitionId(task.getProcessDefinitionId());
-            processTask.setProcessTaskId(task.getId());
-            processTask.setProcessTaskCreateTime(task.getCreateTime());
-            processTask.setProcessTaskName(task.getName());
-            processTask.setProcessTaskInstanceId(task.getProcessInstanceId());
+            ActRuTask actRuTask = new ActRuTask();
+            actRuTask.setTaskDefinitionId(task.getProcessDefinitionId());
+            actRuTask.setTaskId(task.getId());
+            actRuTask.setTaskCreateTime(task.getCreateTime());
+            actRuTask.setTaskName(task.getName());
+            actRuTask.setTaskInstanceId(task.getProcessInstanceId());
             String assignee = task.getAssignee();
-            processTask.setProcessTaskAssignee(assignee);
+            actRuTask.setTaskAssignee(assignee);
+            actRuTask.setTaskExecutionId(task.getExecutionId());
+            actRuTask.setTaskDefKey(task.getTaskDefinitionKey());
             if(StringUtils.isNotEmpty(assignee)){
                 String username = userService.queryUsernameByUserSerial(assignee);
                 if(username == null){
                     throw new SelfThrowException("获取用户失败，用户已经失效或删除！");
                 }
-                processTask.setProcessTaskAssigneeName(username);
+                actRuTask.setTaskAssigneeName(username);
             }
-            list.add(processTask);
+            list.add(actRuTask);
         }
         return list;
     }

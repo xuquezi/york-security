@@ -10,47 +10,71 @@
         <result column="process_instance_id" property="processInstanceId" jdbcType="VARCHAR"></result>
         <result column="flow_opinion" property="flowOpinion" jdbcType="VARCHAR"></result>
         <result column="flow_phase" property="flowPhase" jdbcType="VARCHAR"></result>
+        <result column="flow_last_phase" property="flowLastPhase" jdbcType="VARCHAR"></result>
         <result column="flow_remark" property="flowRemark" jdbcType="VARCHAR"></result>
         <result column="flow_apply_user_id" property="flowApplyUserId" jdbcType="VARCHAR"></result>
         <result column="flow_apply_username" property="flowApplyUsername" jdbcType="VARCHAR"></result>
         <result column="next_user_id" property="nextUserId" jdbcType="VARCHAR"></result>
         <result column="next_user_name" property="nextUsername" jdbcType="VARCHAR"></result>
+        <result column="flow_type" property="flowType" jdbcType="VARCHAR"></result>
+        <result column="flow_operation" property="flowOperation" jdbcType="VARCHAR"></result>
+
     </resultMap>
 
     <insert id="saveFlowMain" parameterType="com.example.york.entity.FlowMain">
-        INSERT into flow_main (flow_main_serial,flow_username,flow_user_id,flow_execute_time,process_definition_id,process_instance_id,flow_opinion,flow_phase,flow_remark,flow_apply_user_id,flow_apply_username,next_user_id,next_user_name)VALUES (#{flowMainId},#{flowUserName},#{flowUserId},#{flowExecuteTime},#{processDefinitionId},#{processInstanceId},#{flowOpinion},#{flowPhase},#{flowRemark},#{flowApplyUserId},#{flowApplyUsername},#{nextUserId},#{nextUsername})
+        INSERT into flow_main (flow_main_serial,flow_username,flow_user_id,flow_execute_time,process_definition_id,process_instance_id,flow_opinion,flow_phase,flow_last_phase,flow_remark,flow_apply_user_id,flow_apply_username,next_user_id,next_user_name,flow_type,flow_operation)VALUES (#{flowMainId},#{flowUserName},#{flowUserId},#{flowExecuteTime},#{processDefinitionId},#{processInstanceId},#{flowOpinion},#{flowPhase},#{flowLastPhase},#{flowRemark},#{flowApplyUserId},#{flowApplyUsername},#{nextUserId},#{nextUsername},#{flowType},#{flowOperation})
     </insert>
 
     <update id="updateFlowMain" parameterType="com.example.york.entity.FlowMain">
         UPDATE flow_main
         <!--此种方式为空值不会更新-->
-        <trim prefix="set" suffixOverrides=",">
+        <set>
             <if test="flowApplyUserId!=null and flowApplyUserId!=''">flow_apply_user_id = #{flowApplyUserId},</if>
             <if test="flowApplyUsername!=null and flowApplyUsername!=''">flow_apply_username = #{flowApplyUsername},</if>
-        </trim>,<!--注意这里的逗号-->
-        flow_username = #{flowUserName},
-        flow_user_id = #{flowUserId},
-        flow_execute_time = #{flowExecuteTime},
-        flow_opinion = #{flowOpinion},
-        flow_remark = #{flowRemark},
-        flow_phase = #{flowPhase},
-        next_user_id = #{nextUserId},
-        next_user_name = #{nextUsername}
+            flow_username = #{flowUserName},
+            flow_user_id = #{flowUserId},
+            flow_execute_time = #{flowExecuteTime},
+            flow_opinion = #{flowOpinion},
+            flow_remark = #{flowRemark},
+            flow_phase = #{flowPhase},
+            flow_last_phase = #{flowLastPhase},
+            next_user_id = #{nextUserId},
+            next_user_name = #{nextUsername},
+            flow_type = #{flowType},
+            flow_operation = #{flowOperation}
+        </set>
         WHERE process_definition_id = #{processDefinitionId}
         and process_instance_id = #{processInstanceId}
     </update>
 
-    <select id="getApplyingProcessByUserId" resultMap="MyBaseResultMap">
+    <select id="queryApplyingListByPage" resultMap="MyBaseResultMap">
         SELECT * from flow_main fm
         where fm.flow_apply_user_id = #{flowApplyUserId}
-        and fm.flow_opinion != '结束'
+        and fm.flow_operation != 'cancel'
+        and fm.flow_operation != 'finish'
         ORDER BY fm.flow_execute_time desc
         Limit #{start},#{limit}
     </select>
 
-    <select id="countApplyingProcessByUserId" resultType="Integer">
+    <select id="countApplyingList" resultType="Integer">
         SELECT count(1) from flow_main fm
         where fm.flow_apply_user_id = #{flowApplyUserId}
-        and fm.flow_opinion != '结束'
+        and fm.flow_operation != 'cancel'
+        and fm.flow_operation != 'finish'
     </select>
+
+    <select id="queryCancelApplyListByPage" resultMap="MyBaseResultMap">
+        SELECT * from flow_main fm
+        where fm.flow_apply_user_id = #{flowApplyUserId}
+        and fm.flow_operation = 'cancel'
+        ORDER BY fm.flow_execute_time desc
+        Limit #{start},#{limit}
+    </select>
+
+    <select id="countCancelApplyList" resultType="Integer">
+        SELECT count(1) from flow_main fm
+        where fm.flow_apply_user_id = #{flowApplyUserId}
+        and fm.flow_operation = 'cancel'
+    </select>
+
 </mapper>

@@ -35,4 +35,10 @@ public class FlowMain {
     private String nextUserId;
     //下一阶段处理人username
     private String nextUsername;
+    //流程上一阶段
+    private String flowLastPhase;
+    //流程类型
+    private String flowType;
+    //流程操作/取消，申请或者退回
+    private String flowOperation;
 }

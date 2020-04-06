@@ -10,12 +10,22 @@
         <result column="process_instance_id" property="processInstanceId" jdbcType="VARCHAR"></result>
         <result column="flow_opinion" property="flowOpinion" jdbcType="VARCHAR"></result>
         <result column="flow_phase" property="flowPhase" jdbcType="VARCHAR"></result>
+        <result column="flow_last_phase" property="flowLastPhase" jdbcType="VARCHAR"></result>
         <result column="flow_remark" property="flowRemark" jdbcType="VARCHAR"></result>
         <result column="next_user_id" property="nextUserId" jdbcType="VARCHAR"></result>
         <result column="next_user_name" property="nextUsername" jdbcType="VARCHAR"></result>
+        <result column="flow_type" property="flowType" jdbcType="VARCHAR"></result>
+        <result column="flow_operation" property="flowOperation" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <insert id="saveFlowTask" parameterType="com.example.york.entity.FlowTask">
-        INSERT into flow_task (flow_serial,flow_username,flow_user_id,flow_execute_time,process_definition_id,process_instance_id,flow_opinion,flow_phase,flow_remark,next_user_id,next_user_name)VALUES (#{flowTaskId},#{flowUserName},#{flowUserId},#{flowExecuteTime},#{processDefinitionId},#{processInstanceId},#{flowOpinion},#{flowPhase},#{flowRemark},#{nextUserId},#{nextUsername})
+        INSERT into flow_task (flow_serial,flow_username,flow_user_id,flow_execute_time,process_definition_id,process_instance_id,flow_opinion,flow_phase,flow_last_phase,flow_remark,next_user_id,next_user_name,flow_type,flow_operation)VALUES (#{flowTaskId},#{flowUserName},#{flowUserId},#{flowExecuteTime},#{processDefinitionId},#{processInstanceId},#{flowOpinion},#{flowPhase},#{flowLastPhase},#{flowRemark},#{nextUserId},#{nextUsername},#{flowType},#{flowOperation})
     </insert>
+
+    <select id="queryProcess" resultMap="MyBaseResultMap">
+        select * from flow_task ft
+        where ft.process_definition_id = #{processDefinitionId}
+        and ft.process_instance_id = #{processInstanceId}
+        order by ft.flow_execute_time
+    </select>
 </mapper>

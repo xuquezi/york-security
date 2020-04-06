@@ -9,8 +9,12 @@ public interface FlowMainService {
 
     void updateFlowMain(FlowMain flowMain);
 
-    List<FlowMain> getApplyingProcessByUserId(String currentUserId, Integer start, Integer limit);
+    List<FlowMain> queryApplyingListByPage(String currentUserId, Integer start, Integer limit);
 
-    Integer countApplyingProcessByUserId(String currentUserId);
+    Integer countApplyingList(String currentUserId);
+
+    List<FlowMain> queryCancelApplyListByPage(String currentUserId, Integer start, Integer limit);
+
+    Integer countCancelApplyList(String currentUserId);
 
 }

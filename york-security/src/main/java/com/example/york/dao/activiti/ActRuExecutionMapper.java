@@ -1,6 +1,6 @@
-package com.example.york.dao;
+package com.example.york.dao.activiti;
 
-import com.example.york.entity.ActRuExecution;
+import com.example.york.entity.activiti.ActRuExecution;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

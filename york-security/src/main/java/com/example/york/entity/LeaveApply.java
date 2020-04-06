@@ -26,13 +26,12 @@ public class LeaveApply {
     private String leaveApplyDepartmentId;
     // 申请人所在部门名称
     private String leaveApplyDepartmentName;
-
     //任务id
-    private String processTaskId;
+    private String taskId;
 
     //实例id
-    private String processTaskInstanceId;
+    private String taskInstanceId;
     // 流程定义id
-    private String processTaskDefinitionId;
+    private String taskDefinitionId;
 
 }

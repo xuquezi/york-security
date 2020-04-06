@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 public interface LeaveApplyMapper {
     Integer saveLeaveApply(LeaveApply leaveApply);
 
-    LeaveApply getLeaveApplyData(@Param("processTaskInstanceId") String processTaskInstanceId,@Param("processTaskDefinitionId") String processTaskDefinitionId);
+    LeaveApply getLeaveApplyData(@Param("taskInstanceId") String processTaskInstanceId,@Param("taskDefinitionId") String processTaskDefinitionId);
 
     Integer updateLeaveApply(LeaveApply leaveApply);
 

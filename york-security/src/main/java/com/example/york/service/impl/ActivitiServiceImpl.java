@@ -142,6 +142,10 @@ public class ActivitiServiceImpl implements ActivitiService {
         return list;
     }
 
+    /**
+     * 打印日志方法
+     * @param processDefinitionList
+     */
     private void processDefLog(List<ProcessDefinition> processDefinitionList){
         if(processDefinitionList!=null&&processDefinitionList.size()>0){
             for (ProcessDefinition processDefinition : processDefinitionList) {

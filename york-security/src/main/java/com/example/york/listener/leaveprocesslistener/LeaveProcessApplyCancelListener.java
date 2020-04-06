@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class LeaveProcessApplyCancelListener extends FlowExecutionListener {
     @Override
     public void notify(DelegateExecution delegateExecution) {
-        this.normalDisAgreeEvent(delegateExecution, ProcessConst.LEAVE_PROCESS_APPLY);
+        this.normalDisAgreeEvent(delegateExecution, ProcessConst.LEAVE_PROCESS_CANCEL,ProcessConst.LEAVE_PROCESS_APPLY);
     }
 }

@@ -12,8 +12,11 @@ public interface FlowMainMapper {
 
     Integer updateFlowMain(FlowMain flowMain);
 
-    List<FlowMain> getApplyingProcessByUserId(@Param("flowApplyUserId") String currentUserId, @Param("start")Integer start, @Param("limit") Integer limit);
+    List<FlowMain> queryApplyingListByPage(@Param("flowApplyUserId") String currentUserId, @Param("start")Integer start, @Param("limit") Integer limit);
 
-    Integer countApplyingProcessByUserId(@Param("flowApplyUserId") String currentUserId);
+    Integer countApplyingList(@Param("flowApplyUserId") String currentUserId);
 
+    List<FlowMain> queryCancelApplyListByPage(@Param("flowApplyUserId") String currentUserId, @Param("start")Integer start, @Param("limit") Integer limit);
+
+    Integer countCancelApplyList(@Param("flowApplyUserId") String currentUserId);
 }

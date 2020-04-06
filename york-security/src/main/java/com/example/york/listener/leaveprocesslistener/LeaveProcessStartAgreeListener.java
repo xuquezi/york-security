@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class LeaveProcessStartAgreeListener extends FlowExecutionListener {
     @Override
     public void notify(DelegateExecution delegateExecution) {
-        super.normalStartEvent(delegateExecution, ProcessConst.LEAVE_APPLY_START);
+        super.normalStartEvent(delegateExecution, ProcessConst.LEAVE_PROCESS_APPLY,ProcessConst.LEAVE_PROCESS_START);
     }
 }

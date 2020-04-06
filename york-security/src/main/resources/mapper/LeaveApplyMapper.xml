@@ -10,19 +10,19 @@
         <result column="leave_apply_time" property="leaveApplyTime" jdbcType="TIMESTAMP"></result>
         <result column="leave_apply_department_name" property="leaveApplyDepartmentName" jdbcType="VARCHAR"></result>
         <result column="leave_apply_department_id" property="leaveApplyDepartmentId" jdbcType="VARCHAR"></result>
-        <result column="process_task_id" property="processTaskId" jdbcType="VARCHAR"></result>
-        <result column="process_task_instance_id" property="processTaskInstanceId" jdbcType="VARCHAR"></result>
-        <result column="process_task_definition_id" property="processTaskDefinitionId" jdbcType="VARCHAR"></result>
+        <result column="process_task_id" property="taskId" jdbcType="VARCHAR"></result>
+        <result column="process_task_instance_id" property="taskInstanceId" jdbcType="VARCHAR"></result>
+        <result column="process_task_definition_id" property="taskDefinitionId" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <insert id="saveLeaveApply" parameterType="com.example.york.entity.LeaveApply">
-        INSERT INTO leave_apply (leave_apply_serial,leave_apply_username,leave_apply_remark,leave_apply_user_id,leave_apply_days,leave_apply_time,leave_apply_department_name,leave_apply_department_id,process_task_id,process_task_instance_id,process_task_definition_id)VALUES (#{leaveApplyId},#{leaveApplyUsername},#{leaveApplyRemark},#{leaveApplyUserId},#{leaveApplyDays},#{leaveApplyTime},#{leaveApplyDepartmentName},#{leaveApplyDepartmentId},#{processTaskId},#{processTaskInstanceId},#{processTaskDefinitionId})
+        INSERT INTO leave_apply (leave_apply_serial,leave_apply_username,leave_apply_remark,leave_apply_user_id,leave_apply_days,leave_apply_time,leave_apply_department_name,leave_apply_department_id,process_task_id,process_task_instance_id,process_task_definition_id)VALUES (#{leaveApplyId},#{leaveApplyUsername},#{leaveApplyRemark},#{leaveApplyUserId},#{leaveApplyDays},#{leaveApplyTime},#{leaveApplyDepartmentName},#{leaveApplyDepartmentId},#{taskId},#{taskInstanceId},#{taskDefinitionId})
     </insert>
 
     <select id="getLeaveApplyData" resultMap="MyBaseResultMap">
         SELECT * from leave_apply la
-        where la.process_task_instance_id = #{processTaskInstanceId}
-        and la.process_task_definition_id = #{processTaskDefinitionId}
+        where la.process_task_instance_id = #{taskInstanceId}
+        and la.process_task_definition_id = #{taskDefinitionId}
     </select>
 
     <update id="updateLeaveApply" parameterType="com.example.york.entity.LeaveApply">
@@ -34,9 +34,9 @@
         leave_apply_time = #{leaveApplyTime},
         leave_apply_department_name = #{leaveApplyDepartmentName},
         leave_apply_department_id = #{leaveApplyDepartmentId},
-        process_task_id = #{processTaskId},
-        process_task_instance_id = #{processTaskInstanceId},
-        process_task_definition_id = #{processTaskDefinitionId}
+        process_task_id = #{taskId},
+        process_task_instance_id = #{taskInstanceId},
+        process_task_definition_id = #{taskDefinitionId}
         WHERE leave_apply_serial = #{leaveApplyId}
     </update>
 </mapper>

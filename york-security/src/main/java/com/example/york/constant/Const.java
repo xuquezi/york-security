@@ -15,4 +15,13 @@ public class Const {
     public static final String DEFAULT_AVATAR_URL = "https://york-vue-1259592596.cos.ap-chengdu.myqcloud.com/avatar/964e40b005724165b8cf772355796c8c.jpeg";
     // 新增用户时默认密码
     public static final String DEFAULT_PASSWORD = "123456";
+
+    public static final String CANCEL = "cancel";
+
+    public static final String FINISH = "finish";
+
+    public static final String FLOW_CANCEL = "cancel";
+    public static final String FLOW_BACK = "back";
+    public static final String FLOW_SUBMIT = "submit";
+    public static final String FLOW_FINISH = "finish";
 }
