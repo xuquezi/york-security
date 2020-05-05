@@ -2,7 +2,6 @@ package com.example.york.service;
 
 import com.example.york.entity.CodeLib;
 import com.example.york.entity.Department;
-import com.example.york.entity.DepartmentUserEdit;
 import com.example.york.entity.PageInfo;
 
 import java.util.List;
@@ -16,15 +15,18 @@ public interface DepartmentService {
 
     Department getDepartmentById(String leaveApplyDepartmentId);
 
-    Department queryDepartmentByManagerId(String userSerial);
 
     List<Department> queryDepartmentList();
 
     void updateDepartment(Department department);
 
-    void editDepartmentUser(DepartmentUserEdit departmentUserEdit);
-
     List<CodeLib> queryDepartmentLevel();
 
     List<Department> queryDepartmentByParentLevel(String levelString);
+
+    boolean validDepartmentName(String departmentName);
+
+    void deleteDepartmentByDepartmentSerial(String departmentSerial);
+
+    void validateUpdateDepartment(Department department);
 }

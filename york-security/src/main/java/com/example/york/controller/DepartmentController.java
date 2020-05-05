@@ -5,13 +5,14 @@ import com.example.york.constant.Const;
 import com.example.york.constant.ResponseCode;
 import com.example.york.entity.CodeLib;
 import com.example.york.entity.Department;
-import com.example.york.entity.DepartmentUserEdit;
 import com.example.york.entity.PageInfo;
+import com.example.york.entity.UserInfo;
 import com.example.york.entity.result.ListResult;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
 import com.example.york.exception.SelfThrowException;
 import com.example.york.service.DepartmentService;
+import com.example.york.service.UserService;
 import com.example.york.utils.JwtTokenUtil;
 import com.example.york.utils.UUIDUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,6 +33,8 @@ import java.util.List;
 public class DepartmentController {
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/queryDepartmentList")
     @ApiOperation(value="获取所有部门", notes="获取所有部门")
@@ -84,27 +87,16 @@ public class DepartmentController {
     @ApiOperation(value="新增部门", notes="新增部门")
     @ApiImplicitParam(name = "department", value = "部门实体department", required = true, dataType = "Department",paramType = "body")
     public ResponseResult createDepartment(@RequestBody Department department, HttpServletRequest request) {
-        //前端传过来的level格式例如01@00，01表示本机构级别，00代表上级机构的级别
-        String level = "";
-        if(department.getDepartmentLevel().contains("@")){
-            String[] split = department.getDepartmentLevel().split("@");
-            level = split[0];
-        }else {
-            throw new SelfThrowException("获取部门级别失败！");
-        }
-        // 重新设置部门级别
-        department.setDepartmentLevel(level);
+
         String token = request.getHeader(Const.HEADER_STRING);
         JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
         String username = jwtTokenUtil.getUsernameFromToken(token);
-
         department.setDepartmentCreateUser(username);//设置创建用户
         department.setDepartmentCreateTime(new Date());//设置创建时间
         department.setDepartmentUpdateTime(new Date());//设置更新时间
         department.setDepartmentUpdateUser(username);//设置更新用户
         department.setDeleteFlag(0);
         department.setDepartmentSerial("DP"+UUIDUtil.getUUID());// 设置uuid主键
-
         departmentService.createDepartment(department);
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
     }
@@ -114,6 +106,7 @@ public class DepartmentController {
     @ApiOperation(value="修改更新部门", notes="修改更新部门")
     @ApiImplicitParam(name = "department", value = "部门实体", required = true, dataType = "Department",paramType = "body")
     public ResponseResult updateDepartment(@RequestBody Department department,HttpServletRequest request) {
+        departmentService.validateUpdateDepartment(department);
         String token = request.getHeader(Const.HEADER_STRING);
         JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
         String username = jwtTokenUtil.getUsernameFromToken(token);
@@ -121,19 +114,27 @@ public class DepartmentController {
         department.setDepartmentUpdateUser(username);
         //设置更新时间
         department.setDepartmentUpdateTime(new Date());
-        //配置角色先删除对应角色再重新添加
         departmentService.updateDepartment(department);
         return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-    @PutMapping("/editDepartmentUser")
+    @DeleteMapping("/deleteDepartmentByDepartmentSerial")
     @SysLog
-    @ApiOperation(value="修改部门下的员工", notes="修改部门下的员工")
-    @ApiImplicitParam(name = "departmentUserEdit", value = "部门实体", required = true, dataType = "DepartmentUserEdit",paramType = "body")
-    public ResponseResult editDepartmentUser(@RequestBody DepartmentUserEdit departmentUserEdit) {
-        departmentService.editDepartmentUser(departmentUserEdit);
-        return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
+    @ApiOperation(value="根据departmentSerial删除部门", notes="根据departmentSerial删除部门")
+    @ApiImplicitParam(name = "departmentSerial", value = "角色id", required = true, dataType = "String",paramType = "query")
+    public ResponseResult deleteDepartmentByDepartmentSerial(@RequestParam(value = "departmentSerial") String departmentSerial){
+        departmentService.deleteDepartmentByDepartmentSerial(departmentSerial);
+        return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
+    @GetMapping("/departmentUserQuery")
+    @ApiOperation(value="根据部门id获取部门下员工(包括停用和启用用户)", notes="根据部门id获取部门下员工(包括停用和启用用户)")
+    @ApiImplicitParam(name = "departmentSerial", value = "部门id", required = true, dataType = "String",paramType = "query")
+    public ListResult departmentUserQuery(@RequestParam(name = "departmentSerial") String departmentSerial){
+        List<UserInfo> list = userService.departmentUserQuery(departmentSerial);
+        ListResult listResult = new ListResult("查询成功", ResponseCode.REQUEST_SUCCESS);
+        listResult.setList(list);
+        return listResult;
+    }
 
 }

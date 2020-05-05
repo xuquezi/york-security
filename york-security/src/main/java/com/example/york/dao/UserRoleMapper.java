@@ -13,4 +13,6 @@ public interface UserRoleMapper {
 
     Integer countUserByRoleSerial(@Param("roleId")String roleSerial);
 
+    Integer deleteRoleByUserSerialRoleSerial(@Param("roleId")String roleSerial, @Param("userId")String userSerial);
+
 }

@@ -79,4 +79,16 @@
         INSERT INTO role_info (role_serial,role_name,status,role_desc,role_create_time,role_create_user,role_update_time,role_update_user,delete_flag)
         VALUES (#{roleSerial},#{roleName},#{status},#{roleDesc},#{roleCreateTime},#{roleCreateUser},#{roleUpdateTime},#{roleUpdateUser},#{deleteFlag})
     </insert>
+
+    <select id="validateRoleName" resultMap="MyBaseResultMap">
+        select ri.role_Serial,ri.role_name from role_info ri
+        where ri.role_name = #{roleName}
+        and ri.delete_flag = 0
+    </select>
+
+    <select id="queryRoleByRoleName" resultMap="MyBaseResultMap">
+        select ri.role_Serial,ri.role_name from role_info ri
+        where ri.role_name = #{roleName}
+        and ri.delete_flag = 0
+    </select>
 </mapper>

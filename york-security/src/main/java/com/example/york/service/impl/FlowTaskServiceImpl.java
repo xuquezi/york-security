@@ -44,7 +44,7 @@ public class FlowTaskServiceImpl implements FlowTaskService {
             flowDetail.setTitle(title);
             String content = flowTask.getFlowUserName()+ "  于 "+ flowTask.getFlowExecuteTime()+"  "+flowTask.getFlowOperation();
             flowDetail.setContent(content);
-            flowDetail.setTimestamp(flowTask.getFlowExecuteTime());
+            flowDetail.setTimestamp(flowTask.getFlowExecuteTime().toString());
             list.add(flowDetail);
         }
         return list;

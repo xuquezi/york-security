@@ -3,12 +3,10 @@ package com.example.york.service.impl;
 
 import com.example.york.dao.UserMapper;
 import com.example.york.dao.UserRoleMapper;
-import com.example.york.entity.Department;
-import com.example.york.entity.PageInfo;
-import com.example.york.entity.User;
-import com.example.york.entity.UserInfo;
+import com.example.york.entity.*;
 import com.example.york.exception.SelfThrowException;
 import com.example.york.service.DepartmentService;
+import com.example.york.service.RoleService;
 import com.example.york.service.UserService;
 import com.example.york.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +26,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRoleMapper userRoleMapper;
     @Autowired
-    private DepartmentService departmentService;
-    @Autowired
     private TaskService taskService;
+    @Autowired
+    private RoleService roleService;
 
     /**
      * 通过用户名查找用户 用户名需保持唯一
@@ -104,16 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 获取所有用户
-     * @return
-     */
-    @Override
-    public List<UserInfo> queryAllUserList() {
-        return userMapper.queryAllUserList();
-    }
-
-    /**
-     * 根据部门id获取所有部门下的员工列表
+     * 根据部门id获取所有部门下的员工列表（停用的不包括）
      * @param departmentSerial
      * @return
      */
@@ -123,39 +112,129 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 更新修改用户的机构
-     * @param
+     * 根据部门id获取所有部门下的员工列表(包括启用和停用)
      * @param departmentSerial
+     * @return
      */
     @Override
-    public void updateDepartmentByUserSerial(String[] users,List<String> userSerialList, String departmentSerial) {
-        for (String userSerial : userSerialList) {
-            String username = null;
-            Department department = departmentService.queryDepartmentByManagerId(userSerial);
-            if(department!=null){
-                username = queryUsernameByUserSerial(userSerial);
-                throw new SelfThrowException("修改失败！"+username+"是部门管理人，请重新分配部门管理人后转移部门！");
-            }
-            // 用户是否有在途的流程需要处理，如果有的话需要先处理掉才能停用
-            long count = taskService.createTaskQuery()
-                    .taskAssignee(userSerial).count();
-            if(count>0){
-                username = queryUsernameByUserSerial(userSerial);
-                throw new SelfThrowException("修改失败！"+username+"还有在途的流程需要处理，不能转移部门！");
+    public List<UserInfo> departmentUserQuery(String departmentSerial) {
+        return userMapper.departmentUserQuery(departmentSerial);
+    }
+
+
+    /**
+     * 根据用户名查询是否有同名用户
+     * @param username
+     * @return
+     */
+    @Override
+    public boolean validUsername(String username) {
+        List<UserInfo> list = userMapper.validUsername(username);
+        if(list!=null && list.size()>0){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 校验相同邮箱
+     * @param email
+     * @return
+     */
+    @Override
+    public boolean validateEmail(String email) {
+        List<UserInfo> list = userMapper.validateEmail(email);
+        if(list!=null && list.size()>0){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 校验相同手机号码
+     * @param mobile
+     * @return
+     */
+    @Override
+    public boolean validateMobile(String mobile) {
+        List<UserInfo> list = userMapper.validateMobile(mobile);
+        if(list!=null && list.size()>0){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 更新时候先校验
+     * @param userInfo
+     */
+    @Override
+    public void validateUpdateUser(UserInfo userInfo) {
+        List<UserInfo> list1 = userMapper.validUsername(userInfo.getUsername());
+        for (UserInfo info : list1) {
+            if(!userInfo.getUserSerial().equals(info.getUserSerial())){
+                throw new SelfThrowException("用户名已经被其他用户占用！");
             }
         }
-        userMapper.updateDepartmentByUserSerial(users,departmentSerial);
+        List<UserInfo> list2 = userMapper.validateEmail(userInfo.getEmail());
+        for (UserInfo info : list2) {
+            if(!userInfo.getUserSerial().equals(info.getUserSerial())){
+                throw new SelfThrowException("邮箱已经被其他用户占用！");
+            }
+        }
+        List<UserInfo> list3 = userMapper.validateMobile(userInfo.getMobile());
+        for (UserInfo info : list3) {
+            if(!userInfo.getUserSerial().equals(info.getUserSerial())){
+                throw new SelfThrowException("手机号已经被其他用户占用！");
+            }
+        }
 
     }
 
     /**
-     * 通过部门id，致空用户的部门
-     * @param departmentSerial
+     * 根据角色id获取用户
+     * @param roleSerial
+     * @return
      */
     @Override
-    public void resetDepartment(String departmentSerial) {
-        userMapper.resetDepartment(departmentSerial);
+    public List<UserInfo> queryUserByRole(String roleSerial) {
+        return userMapper.queryUserByRole(roleSerial);
     }
+
+    /**
+     * 添加角色
+     * @param roleSerial
+     * @param userSerial
+     */
+    @Override
+    public void addRoleByUserSerial(String roleSerial, String userSerial) {
+        String urSerial = "UR"+UUIDUtil.getUUID();
+        userRoleMapper.insertRoles(userSerial,roleSerial,urSerial);
+
+    }
+
+    /**
+     * 删除角色
+     * @param roleSerial
+     * @param userSerial
+     */
+    @Override
+    public void deleteRoleByUserSerial(String roleSerial, String userSerial) {
+        userRoleMapper.deleteRoleByUserSerialRoleSerial(roleSerial,userSerial);
+    }
+
+
+    /**
+     * 获取部门经理
+     * @param departmentSerial
+     * @return
+     */
+    @Override
+    public UserInfo getDepartmentManagerUserSerial(String departmentSerial) {
+        String roleName = "manager";
+        return userMapper.getDepartmentManagerUserSerial(departmentSerial,roleName);
+    }
+
 
     /**
      * 停用或者启用用户
@@ -169,9 +248,11 @@ public class UserServiceImpl implements UserService {
              * 停用用户时候判断用户是不是部门管理人
              * 用户是部门管理人需要转移部门管理人后才能停用
              */
-            Department department = departmentService.queryDepartmentByManagerId(userSerial);
-            if(department!=null){
-                throw new SelfThrowException("该用户是部门管理人，请重新分配部门管理人后停用！");
+            List<RoleInfo> roleList = roleService.queryRolesByUserId(userSerial);
+            for (RoleInfo roleInfo : roleList) {
+                //这里先写死，后期可以修改配置一下。
+                if("manager".equals(roleInfo.getRoleName()))
+                    throw new SelfThrowException("该用户是部门管理人，请重新分配部门管理人后停用！");
             }
             // 用户是否有在途的流程需要处理，如果有的话需要先处理掉才能停用
             long count = taskService.createTaskQuery()
@@ -204,12 +285,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserByUserSerial(String userSerial) {
         /**
-         * 停用用户时候判断用户是不是部门管理人
+         * 删除用户时候判断用户是不是部门管理人
          * 用户是部门管理人需要转移部门管理人后才能停用
          */
-        Department department = departmentService.queryDepartmentByManagerId(userSerial);
-        if(department!=null){
-            throw new SelfThrowException("该用户是部门管理人，请重新分配部门管理人后停用！");
+        List<RoleInfo> roleList = roleService.queryRolesByUserId(userSerial);
+        for (RoleInfo roleInfo : roleList) {
+            //这里先写死，后期可以修改配置一下。
+            if("manager".equals(roleInfo.getRoleName()))
+                throw new SelfThrowException("该用户是部门管理人，请重新分配部门管理人后停用！");
         }
         // 用户是否有在途的流程需要处理，如果有的话需要先处理掉才能停用
         long count = taskService.createTaskQuery()

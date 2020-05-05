@@ -5,6 +5,7 @@ import com.example.york.entity.*;
 import com.example.york.exception.SelfThrowException;
 import com.example.york.service.CodeService;
 import com.example.york.service.DepartmentService;
+import com.example.york.service.RoleService;
 import com.example.york.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     private UserService userService;
     @Autowired
     private CodeService codeService;
+    @Autowired
+    private RoleService roleService;
 
     /**
      * 分页查询部门列表
@@ -37,7 +40,15 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public PageInfo queryDepartmentListByPage(String departmentName, Integer limit, Integer page) {
         Integer start = (page-1)*limit;
-        List<RoleInfo> list = departmentMapper.queryDepartmentListByPage(departmentName, start, limit);
+        List<Department> list = departmentMapper.queryDepartmentListByPage(departmentName, start, limit);
+        for (Department department : list) {
+            //获取部门管理人，部门管理人是部门下有manager角色的用户
+            UserInfo userInfo = userService.getDepartmentManagerUserSerial(department.getDepartmentSerial());
+            if(userInfo!=null){
+                department.setManagerUserSerial(userInfo.getUserSerial());
+                department.setManagerUsername(userInfo.getUsername());
+            }
+        }
         Integer total = departmentMapper.countDepartmentList(departmentName);
         return new PageInfo(total,list);
     }
@@ -73,16 +84,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     /**
-     * 根据部门管理人id获取部门
-     * @param userSerial
-     * @return
-     */
-    @Override
-    public Department queryDepartmentByManagerId(String userSerial) {
-        return departmentMapper.queryDepartmentByManagerId(userSerial);
-    }
-
-    /**
      * 查询所有部门列表
      * @return
      */
@@ -97,43 +98,30 @@ public class DepartmentServiceImpl implements DepartmentService {
      */
     @Override
     public void updateDepartment(Department department) {
+        // 获取前端传来的部门经理id
+        String managerUserSerial = department.getManagerUserSerial();
+        // 获取原部门经理id
+        UserInfo userInfo = userService.getDepartmentManagerUserSerial(department.getDepartmentSerial());
+        // 如果部门没有部门经理
+        RoleInfo roleInfo = roleService.queryRoleByRoleName("manager");
+        if(roleInfo==null){
+            throw new SelfThrowException("没有manager角色或者该角色已经被停用！");
+        }
+        if(userInfo==null){
+            // 直接添加manager角色
+            userService.addRoleByUserSerial(roleInfo.getRoleSerial(),managerUserSerial);
+        }
+        else if(userInfo!=null&&!managerUserSerial.equals(userInfo.getUserSerial())){
+            // 如果不相同则部门经理进行了修改。
+            // 原部门经理用户manager角色删除
+            userService.deleteRoleByUserSerial(roleInfo.getRoleSerial(),userInfo.getUserSerial());
+            // 新部门经理用户添加manager角色
+            userService.addRoleByUserSerial(roleInfo.getRoleSerial(),managerUserSerial);
+        }
+
         departmentMapper.updateDepartment(department);
     }
 
-    /**
-     * 编辑部门下的员工
-     * @param departmentUserEdit
-     */
-    @Override
-    public void editDepartmentUser(DepartmentUserEdit departmentUserEdit) {
-        String departmentSerial = departmentUserEdit.getDepartmentSerial();
-        String[] users = departmentUserEdit.getDepartmentUserList();
-        List<String> userList= Arrays.asList(users);
-        List<String> arrayList=new ArrayList(userList);
-        // 获取当前部门的管理人。
-        // 如果传过来的数组中不包括当前部门的管理人，则不能修改，部门管理人不能在这里编辑移除。
-        String managerUserSerial = queryDepartmentManagerUserSerial(departmentSerial);
-        if(StringUtils.isNotEmpty(managerUserSerial)){
-            boolean flag = false;
-            for (String user : users) {
-                if(user.equals(managerUserSerial)){
-                    flag = true;
-                }
-            }
-            if(flag == false){
-                throw new SelfThrowException("修改失败！部门的管理人不能在这里编辑转移部门！");
-            }
-        }
-        // 排除当前部门的管理人
-        arrayList.remove(managerUserSerial);
-        //先将部门id是departmentSerial的用户，将外键部门id致空
-        userService.resetDepartment(departmentSerial);
-        //再设置用户的部门id外键
-        userService.updateDepartmentByUserSerial(users,arrayList,departmentSerial);
-    }
-    private String queryDepartmentManagerUserSerial(String departmentSerial){
-        return departmentMapper.queryDepartmentManagerUserSerial(departmentSerial);
-    }
 
     /**
      * 查询配置里面的所有部门级别
@@ -157,5 +145,53 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new SelfThrowException("获取父类部门级别失败！请先配置上级部门！");
         }
         return list;
+    }
+
+    /**
+     * 校验部门名称
+     * @param departmentName
+     * @return
+     */
+    @Override
+    public boolean validDepartmentName(String departmentName) {
+        List<Department> list = departmentMapper.validDepartmentName(departmentName);
+        if(list!=null && list.size()>0){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 删除部门
+     * @param departmentSerial
+     */
+    @Override
+    public void deleteDepartmentByDepartmentSerial(String departmentSerial) {
+        //查询部门下用户，包括停用用户，因为停用的可能启用
+        List<UserInfo> list1 = userService.departmentUserQuery(departmentSerial);
+        if(list1!=null&&list1.size()>0){
+            throw new SelfThrowException("部门下还有用户，不能删除！");
+        }
+        // 获取下级部门
+        List<Department> list2 = departmentMapper.queryDepartmentByParentSerial(departmentSerial);
+        if(list2!=null&&list2.size()>0){
+            throw new SelfThrowException("部门下还有下级部门，不能删除！");
+        }
+        departmentMapper.deleteDepartmentByDepartmentSerial(departmentSerial);
+
+    }
+
+    /**
+     * 更新前校验
+     * @param department
+     */
+    @Override
+    public void validateUpdateDepartment(Department department) {
+        List<Department> list = departmentMapper.validDepartmentName(department.getDepartmentName());
+        for (Department departmentInfo : list) {
+            if(!department.getDepartmentSerial().equals(departmentInfo.getDepartmentSerial())){
+                throw new SelfThrowException("已有相同的部门名称！");
+            }
+        }
     }
 }

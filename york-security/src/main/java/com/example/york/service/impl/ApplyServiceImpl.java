@@ -112,6 +112,7 @@ public class ApplyServiceImpl implements ApplyService {
         return flowTaskService.queryProcess(processDefinitionId,processInstanceId);
     }
 
+
     /**
      * 分页查询请假流程等待申请列表数据
      * @param limit
@@ -148,9 +149,6 @@ public class ApplyServiceImpl implements ApplyService {
      */
     @Override
     public void applyLeaveProcess(LeaveApply leaveApply) {
-        String approveUserId = "";
-        String approveUsername = "";
-        String[] approveUser = null;
 
         // 当前阶段操作人
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,29 +158,24 @@ public class ApplyServiceImpl implements ApplyService {
 
         //获取下一阶段的审批人
         String leaveApplyDepartmentId = leaveApply.getLeaveApplyDepartmentId();
-        approveUser = this.getApproveUser(leaveApplyDepartmentId).split("@");
-        if(approveUser.length>1){
-            approveUserId=approveUser[0];
-            approveUsername = approveUser[1];
-        }else if(approveUser.length==1){
-            approveUserId=approveUser[0];
+        // 根据部门Id获取部门经理
+        UserInfo userInfo = userService.getDepartmentManagerUserSerial(leaveApplyDepartmentId);
+        if(userInfo==null){
+            throw new SelfThrowException("获取审批人失败!");
         }
         //如果当前用户和审批用户一致，一般是当前用户就是部门的管理者，这时需要再取一下上级领导作为下一级审批人。
-        if((currentUserId).equals(approveUserId)){
+        if((currentUserId).equals(userInfo.getUserSerial())){
             Department department = departmentService.getDepartmentById(leaveApplyDepartmentId);
-            approveUser = this.getApproveUser(department.getParentDepartmentSerial()).split("@");
-            if(approveUser.length>1){
-                approveUserId=approveUser[0];
-                approveUsername = approveUser[1];
-            }else if(approveUser.length==1){
-                approveUserId=approveUser[0];
+            userInfo = userService.getDepartmentManagerUserSerial(department.getParentDepartmentSerial());
+            if(userInfo==null){
+                throw new SelfThrowException("获取审批人失败!");
             }
         }
         Map<String , Object> map = new HashMap<>();
         map.put(ProcessConst.LEAVE_PROCESS_APPLY,Const.AGREE);
         // 下一阶段操作人
-        map.put("userId",approveUserId);
-        map.put("username",approveUsername);
+        map.put("userId", userInfo.getUserSerial());
+        map.put("username",userInfo.getUsername());
         map.put("currentUserId",currentUserId);
         map.put("currentUsername",currentUserName);
         map.put("applyUserId",currentUserId);
@@ -234,63 +227,6 @@ public class ApplyServiceImpl implements ApplyService {
     }
 
     /**
-     * 请假流程审批同意
-     * @param approveResult
-     */
-    @Override
-    public void agreeLeaveApply (ApproveResult approveResult) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User userDetail = (User)authentication.getPrincipal();
-        String currentUserId = userDetail.getUserId();
-        String currentUserName = userDetail.getUsername();
-        Map<String , Object> map = new HashMap<>();
-        // 当前阶段操作人
-        map.put("currentUserId",currentUserId);
-        map.put("currentUsername",currentUserName);
-        /**
-         * 下一阶段操作人
-         * 说明一下这里为什么要设置，原因是这里设置的都是全局变量。
-         * 如果这里不设置下一阶段的处理人，那么全局变量中的userId和username仍然是原值
-         * 导致listener中存储更新flow_task和flow_main有些问题。
-         */
-        map.put("userId",Const.FINISH);
-        map.put("username",Const.FINISH);
-        map.put(ProcessConst.LEAVE_PROCESS_APPROVE,Const.AGREE);
-        map.put("flowOperation",Const.FLOW_FINISH);
-        String approveRemark = approveResult.getApproveRemark();
-        if(StringUtils.isNotEmpty(approveRemark)){
-            map.put("remark",approveRemark);
-        }
-        taskService.complete(approveResult.getProcessTaskId(),map);
-    }
-
-    /**
-     * 请假流程退回到申请人
-     * @param approveResult
-     */
-    @Override
-    public void backLeaveApply(ApproveResult approveResult) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User userDetail = (User)authentication.getPrincipal();
-        String currentUserId = userDetail.getUserId();
-        String currentUserName = userDetail.getUsername();
-        Map<String , Object> map = new HashMap<>();
-        // 当前阶段操作人
-        map.put("currentUserId",currentUserId);
-        map.put("currentUsername",currentUserName);
-        // 下一阶段操作人
-        map.put("userId",approveResult.getApplyUserId());
-        map.put("username",approveResult.getApplyUsername());
-        map.put(ProcessConst.LEAVE_PROCESS_APPROVE,Const.DISAGREE);
-        map.put("flowOperation",Const.FLOW_BACK);
-        String approveRemark = approveResult.getApproveRemark();
-        if(StringUtils.isNotEmpty(approveRemark)){
-            map.put("remark",approveRemark);
-        }
-        taskService.complete(approveResult.getProcessTaskId(),map);
-    }
-
-    /**
      * 分页查询被取消的流程
      * @param limit
      * @param page
@@ -304,6 +240,22 @@ public class ApplyServiceImpl implements ApplyService {
         Integer total = flowMainService.countCancelApplyList(currentUserId);
         return new PageInfo(total,list);
     }
+
+    /**
+     * 分页查询审批完成的流程
+     * @param limit
+     * @param page
+     * @param currentUserId
+     * @return
+     */
+    @Override
+    public PageInfo queryFinishApplyListByPage(Integer limit, Integer page, String currentUserId) {
+        Integer start = (page-1)*limit;
+        List<FlowMain> list = flowMainService.queryFinishApplyListByPage(currentUserId,start,limit);
+        Integer total = flowMainService.countFinishApplyList(currentUserId);
+        return new PageInfo(total,list);
+    }
+
 
     /**
      * 分页查询申请中流程数据
@@ -321,32 +273,6 @@ public class ApplyServiceImpl implements ApplyService {
     }
 
     /**
-     * 分页查询待审批流程
-     * @param limit
-     * @param page
-     * @param currentUserId
-     * @param processType
-     * @return
-     */
-    @Override
-    public PageInfo queryLeaveWaitApproveListByPage(Integer limit, Integer page, String currentUserId, String processType) {
-        Integer start = (page-1)*limit;
-        List<Task> taskList = taskService.createTaskQuery()
-                .taskAssignee(currentUserId) //操作用户
-                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPROVE) //阶段的key
-                .processDefinitionKey(processType) //类型
-                .orderByTaskCreateTime()
-                .desc().listPage(start, limit);
-        long count = taskService.createTaskQuery()
-                .taskAssignee(currentUserId)
-                .taskDefinitionKey(ProcessConst.LEAVE_PROCESS_APPROVE) //阶段的key
-                .processDefinitionKey(processType)
-                .count();
-        List<ActRuTask> processTaskList = transferTaskList(taskList);
-        return new PageInfo(count,processTaskList);
-    }
-
-    /**
      * 获取申请的数据
      * @param taskInstanceId
      * @param taskDefinitionId
@@ -355,27 +281,6 @@ public class ApplyServiceImpl implements ApplyService {
     @Override
     public LeaveApply getLeaveApplyData(String taskInstanceId, String taskDefinitionId) {
         return leaveApplyMapper.getLeaveApplyData(taskInstanceId,taskDefinitionId);
-    }
-
-
-    /**
-     * 获取上级审批人，如果当前机构没有，会去上级机构寻找审批人。
-     * 如果上级机构也没有的话，就报错！
-     * @param departmentId
-     * @return
-     */
-    private String getApproveUser (String departmentId){
-        Department department = departmentService.getDepartmentById(departmentId);
-        if(department == null){
-            throw new SelfThrowException("获取上级审批人失败！");
-        }
-        if(department != null&&StringUtils.isEmpty(department.getManagerUserSerial())&& StringUtils.isEmpty(department.getParentDepartmentSerial())){
-            throw new SelfThrowException("获取上级审批人失败！");
-        }
-        if(department != null&&StringUtils.isEmpty(department.getManagerUserSerial())&&StringUtils.isNotEmpty(department.getParentDepartmentSerial())){
-            return this.getApproveUser(department.getParentDepartmentSerial());
-        }
-        return department.getManagerUserSerial()+"@"+department.getUserInfo().getUsername();
     }
 
     /**

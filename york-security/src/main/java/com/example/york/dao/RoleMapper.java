@@ -27,4 +27,8 @@ public interface RoleMapper {
 
     Integer createRole(RoleInfo roleInfo);
 
+    List<RoleInfo> validateRoleName(@Param("roleName") String roleName);
+
+    RoleInfo queryRoleByRoleName(@Param("roleName")String roleName);
+
 }

@@ -34,8 +34,16 @@ public interface UserMapper {
 
     List<UserInfo> queryUserByDepartmentSerial(@Param("departmentSerial") String departmentSerial);
 
-    void updateDepartmentByUserSerial(@Param("users")String[] users,@Param("departmentSerial") String departmentSerial);
+    List<UserInfo> departmentUserQuery(@Param("departmentSerial")String departmentSerial);
 
-    void resetDepartment(@Param("departmentSerial")String departmentSerial);
+    List<UserInfo> validUsername(@Param("username")String username);
+
+    List<UserInfo> validateEmail(@Param("email") String email);
+
+    UserInfo getDepartmentManagerUserSerial(@Param("departmentSerial") String departmentSerial,@Param("roleName") String roleName);
+
+    List<UserInfo> validateMobile(@Param("mobile") String mobile);
+
+    List<UserInfo> queryUserByRole(@Param("roleSerial")String roleSerial);
 
 }

@@ -134,6 +134,8 @@ public class UserController {
     @ApiOperation(value="修改更新用户", notes="修改更新用户")
     @ApiImplicitParam(name = "userInfo", value = "用户实体user", required = true, dataType = "UserInfo",paramType = "body")
     public ResponseResult update(@RequestBody UserInfo userInfo,HttpServletRequest request) {
+        //先校验一下更新数据
+        userService.validateUpdateUser(userInfo);
         if(userInfo.getRoles().length < 1){
             //控制用户下必须有权限角色
             throw new SelfThrowException("用户下必须有权限角色");
@@ -170,15 +172,6 @@ public class UserController {
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
     }
 
-    @GetMapping("/queryAllUserList")
-    @ApiOperation(value="获取所有用户（已启用）", notes="获取所有用户（已启用）")
-    public ListResult queryAllUserList(){
-        List<UserInfo> userList = userService.queryAllUserList();
-        ListResult listResult = new ListResult("查询成功", ResponseCode.REQUEST_SUCCESS);
-        listResult.setList(userList);
-        return listResult;
-    }
-
     @GetMapping("/queryUserByDepartmentSerial")
     @ApiOperation(value="根据部门id获取部门下员工", notes="根据部门id获取部门下员工")
     @ApiImplicitParam(name = "departmentSerial", value = "部门id", required = true, dataType = "String",paramType = "query")
@@ -189,27 +182,6 @@ public class UserController {
         return listResult;
     }
 
-    @GetMapping("/queryUserArrayByDepartmentSerial")
-    @ApiOperation(value="根据部门id获取部门下员工（返回userId的数组）", notes="根据部门id获取部门下员工（返回userId的数组）")
-    @ApiImplicitParam(name = "departmentSerial", value = "部门id", required = true, dataType = "String",paramType = "query")
-    public StringArrayResult queryUserArrayByDepartmentSerial(@RequestParam(name = "departmentSerial") String departmentSerial){
-        List<UserInfo> list = userService.queryUserByDepartmentSerial(departmentSerial);
-        String[] users = convertUserList(list);
-        StringArrayResult stringArrayResult = new StringArrayResult("查询成功", ResponseCode.REQUEST_SUCCESS);
-        stringArrayResult.setArray(users);
-        return stringArrayResult;
-    }
-    private String[] convertUserList(List<UserInfo> userList) {
-        if(userList!=null&&userList.size()>0){
-            String[] users = new String[userList.size()];
-            for(int i = 0;i<userList.size();i++){
-                users[i] = userList.get(i).getUserSerial();
-            }
-            return users;
-        }else {
-            return null;
-        }
-    }
 
     private String[] convertRoleList(List<RoleInfo> roleList) {
         if(roleList!=null&&roleList.size()>0){

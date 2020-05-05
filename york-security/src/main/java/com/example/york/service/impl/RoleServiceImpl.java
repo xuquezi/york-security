@@ -4,6 +4,7 @@ import com.example.york.dao.RoleMapper;
 import com.example.york.dao.UserRoleMapper;
 import com.example.york.entity.PageInfo;
 import com.example.york.entity.RoleInfo;
+import com.example.york.entity.UserInfo;
 import com.example.york.exception.SelfThrowException;
 import com.example.york.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
@@ -117,5 +118,45 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void createRole(RoleInfo roleInfo) {
         roleMapper.createRole(roleInfo);
+    }
+
+    /**
+     * 校验是否有相同的角色名
+     * @param roleName
+     * @return
+     */
+    @Override
+    public boolean validateRoleName(String roleName) {
+        List<RoleInfo> list = roleMapper.validateRoleName(roleName);
+        if(list!=null && list.size()>0){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 更新前校验
+     * @param roleInfo
+     */
+    @Override
+    public void validateUpdateRole(RoleInfo roleInfo) {
+        List<RoleInfo> list = roleMapper.validateRoleName(roleInfo.getRoleName());
+        for (RoleInfo info : list) {
+            if(!roleInfo.getRoleSerial().equals(info.getRoleSerial())){
+                throw new SelfThrowException("已有相同的角色名称！");
+            }
+        }
+
+    }
+
+    /**
+     * 根据角色名获取角色实体类
+     * @param roleName
+     * @return
+     */
+    @Override
+    public RoleInfo queryRoleByRoleName(String roleName) {
+
+        return roleMapper.queryRoleByRoleName(roleName);
     }
 }

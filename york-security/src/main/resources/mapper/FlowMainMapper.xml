@@ -77,4 +77,18 @@
         and fm.flow_operation = 'cancel'
     </select>
 
+    <select id="queryFinishApplyListByPage" resultMap="MyBaseResultMap">
+        SELECT * from flow_main fm
+        where fm.flow_apply_user_id = #{flowApplyUserId}
+        and fm.flow_operation = 'finish'
+        ORDER BY fm.flow_execute_time desc
+        Limit #{start},#{limit}
+    </select>
+
+    <select id="countFinishApplyList" resultType="Integer">
+        SELECT count(1) from flow_main fm
+        where fm.flow_apply_user_id = #{flowApplyUserId}
+        and fm.flow_operation = 'finish'
+    </select>
+
 </mapper>

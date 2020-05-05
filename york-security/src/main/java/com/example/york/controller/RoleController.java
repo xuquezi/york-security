@@ -5,10 +5,12 @@ import com.example.york.constant.Const;
 import com.example.york.constant.ResponseCode;
 import com.example.york.entity.PageInfo;
 import com.example.york.entity.RoleInfo;
+import com.example.york.entity.UserInfo;
 import com.example.york.entity.result.ListResult;
 import com.example.york.entity.result.PageResult;
 import com.example.york.entity.result.ResponseResult;
 import com.example.york.service.RoleService;
+import com.example.york.service.UserService;
 import com.example.york.utils.JwtTokenUtil;
 import com.example.york.utils.UUIDUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -28,6 +30,8 @@ import java.util.List;
 public class RoleController {
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/queryRoleList")
     @ApiOperation(value="获取所有角色", notes="获取所有角色")
@@ -66,11 +70,22 @@ public class RoleController {
 
     @DeleteMapping("/deleteRoleByRoleSerial")
     @SysLog
-    @ApiOperation(value="根据roleSerial删除用户", notes="根据roleSerial删除用户")
+    @ApiOperation(value="根据roleSerial删除角色", notes="根据roleSerial删除角色")
     @ApiImplicitParam(name = "roleSerial", value = "角色id", required = true, dataType = "String",paramType = "query")
     public ResponseResult deleteRoleByRoleSerial(@RequestParam(value = "roleSerial") String roleSerial){
         roleService.deleteRoleByRoleSerial(roleSerial);
         return new ResponseResult("删除成功",ResponseCode.REQUEST_SUCCESS);
+    }
+
+    @GetMapping("/queryUserByRole")
+    @SysLog
+    @ApiOperation(value="根据roleSerial获取用户", notes="根据roleSerial获取用户")
+    @ApiImplicitParam(name = "roleSerial", value = "角色id", required = true, dataType = "String",paramType = "query")
+    public ListResult queryUserByRole(@RequestParam(value = "roleSerial") String roleSerial){
+        List<UserInfo> list = userService.queryUserByRole(roleSerial);
+        ListResult listResult = new ListResult("查询",ResponseCode.REQUEST_SUCCESS);
+        listResult.setList(list);
+        return listResult;
     }
 
     @PutMapping("/updateRole")
@@ -78,6 +93,7 @@ public class RoleController {
     @ApiOperation(value="修改更新角色", notes="修改更新角色")
     @ApiImplicitParam(name = "roleInfo", value = "角色实体role", required = true, dataType = "RoleInfo",paramType = "body")
     public ResponseResult updateRole(@RequestBody RoleInfo roleInfo,HttpServletRequest request) {
+        roleService.validateUpdateRole(roleInfo);
         String token = request.getHeader(Const.HEADER_STRING);
         JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
         String username = jwtTokenUtil.getUsernameFromToken(token);

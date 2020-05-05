@@ -28,15 +28,14 @@ public class Department {
     private String departmentUpdateUser;
     //部门是否删除 0没删除，1删除
     private Integer deleteFlag;
-    // 部门管理人用户id
-    private String managerUserSerial;
     // 部门上级部门对应的部门id
     private String parentDepartmentSerial;
     //部门级别
     private String departmentLevel;
-
-    //存放部门管理人的用户信息
-    private UserInfo userInfo;
+    //部门管理人id
+    private String managerUserSerial;
+    //部门管理人名字
+    private String managerUsername;
 
 
 

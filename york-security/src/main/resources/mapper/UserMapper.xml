@@ -27,7 +27,6 @@
             <result column="department_update_user" property="departmentUpdateUser" jdbcType="VARCHAR" />
             <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
             <result column="department_desc" property="departmentDesc" jdbcType="VARCHAR"></result>
-            <result column="manager_user_serial" property="managerUserSerial" jdbcType="VARCHAR"></result>
             <result column="parent_department_serial" property="parentDepartmentSerial" jdbcType="VARCHAR"></result>
             <result column="department_level" property="departmentLevel" jdbcType="VARCHAR"></result>
         </association>
@@ -55,11 +54,31 @@
         and u.status = 0
     </select>
 
+    <select id="validUsername" resultMap ="MyBaseResultMap">
+        SELECT u.user_serial,u.username
+        from user_info u
+        where u.username = #{username}
+        and u.delete_flag = 0
+    </select>
+
+    <select id="validateEmail" resultMap ="MyBaseResultMap">
+        SELECT u.user_serial,u.username
+        from user_info u
+        where u.email = #{email}
+        and u.delete_flag = 0
+    </select>
+
+    <select id="validateMobile" resultMap ="MyBaseResultMap">
+        SELECT u.user_serial,u.username
+        from user_info u
+        where u.mobile = #{mobile}
+        and u.delete_flag = 0
+    </select>
+
     <select id="queryUserInfoByUserSerial" resultMap ="MyBaseResultMap">
         SELECT u.user_serial,u.username,u.password,u.avatar,u.email,
         u.mobile,u.status,u.sex,u.born,u.delete_flag,
-        d.department_serial,d.department_name,d.department_level,
-        d.manager_user_serial,d.parent_department_serial
+        d.department_serial,d.department_name,d.department_level,d.parent_department_serial
         from user_info u
         left join department_info d
         on d.department_serial = u.department_serial
@@ -67,6 +86,18 @@
         where u.user_serial = #{userId}
         and u.delete_flag = 0
         and u.status = 0
+    </select>
+
+    <select id="queryUserByRole" resultMap="MyBaseResultMap">
+        select ui.user_serial,ui.username,ui.status,d.department_name,d.department_serial
+        from user_info ui
+        INNER JOIN user_role ur
+        on ui.user_serial = ur.user_serial
+        and ur.role_serial = #{roleSerial}
+        and ui.delete_flag = 0
+        left join department_info d
+        on d.department_serial = ui.department_serial
+        and d.delete_flag = 0
     </select>
 
     <select id="queryUserListByPage" resultMap ="MyBaseResultMap">
@@ -154,31 +185,32 @@
         and u.delete_flag = 0
     </select>
 
-    <select id="queryAllUserList" resultMap ="MyBaseResultMap">
-        SELECT ui.* from user_info ui
-        where ui.status = 0
-        and ui.delete_flag = 0
-    </select>
-
     <select id="queryUserByDepartmentSerial" resultMap ="MyBaseResultMap">
-        SELECT ui.username,ui.user_serial from user_info ui
+        SELECT ui.username,ui.user_serial,ui.status,di.department_serial,di.department_name
+        from user_info ui
+        left join department_info di on di.department_serial = ui.department_serial
         where ui.status = 0
         and ui.delete_flag = 0
         and ui.department_serial = #{departmentSerial}
     </select>
 
-    <update id="resetDepartment">
-        UPDATE user_info ui
-        set ui.department_serial = NULL
-        where ui.department_serial = #{departmentSerial}
-    </update>
+    <select id="departmentUserQuery" resultMap ="MyBaseResultMap">
+        SELECT ui.username,ui.user_serial,ui.status,di.department_serial,di.department_name
+        from user_info ui
+        left join department_info di on di.department_serial = ui.department_serial
+        where ui.delete_flag = 0
+        and ui.department_serial = #{departmentSerial}
+    </select>
 
-    <update id="updateDepartmentByUserSerial">
-        UPDATE user_info ui
-        set ui.department_serial = #{departmentSerial}
-        where ui.user_serial in
-        <foreach item="item" collection="users" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </update>
+    <select id="getDepartmentManagerUserSerial" resultMap="MyBaseResultMap">
+        select ui.user_serial,ui.username from user_info ui,user_role ur,role_info r
+        where ui.status = 0
+        and ui.delete_flag = 0
+        and ui.user_serial = ur.user_serial
+        and ur.role_serial = r.role_serial
+        and r.status = 0
+        and r.delete_flag = 0
+        and r.role_name = #{roleName}
+        and ui.department_serial = #{departmentSerial}
+    </select>
 </mapper>

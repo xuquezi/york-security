@@ -10,27 +10,8 @@
         <result column="department_update_user" property="departmentUpdateUser" jdbcType="VARCHAR" />
         <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
         <result column="department_desc" property="departmentDesc" jdbcType="VARCHAR"></result>
-        <result column="manager_user_serial" property="managerUserSerial" jdbcType="VARCHAR"></result>
         <result column="parent_department_serial" property="parentDepartmentSerial" jdbcType="VARCHAR"></result>
         <result column="department_level" property="departmentLevel" jdbcType="VARCHAR"></result>
-
-        <!--department下部门管理人与用户的一对一关系-->
-        <association property="userInfo" column="manager_user_serial" javaType="com.example.york.entity.UserInfo">
-            <id column="user_serial" property="userSerial" jdbcType="VARCHAR" />
-            <result column="username" property="username" jdbcType="VARCHAR" />
-            <result column="password" property="password" jdbcType="VARCHAR" />
-            <result column="avatar" property="avatar" jdbcType="VARCHAR" />
-            <result column="email" property="email" jdbcType="VARCHAR" />
-            <result column="mobile" property="mobile" jdbcType="VARCHAR" />
-            <result column="status" property="status" jdbcType="INTEGER" />
-            <result column="user_create_time" property="userCreateTime" jdbcType="TIMESTAMP" />
-            <result column="user_create_user" property="userCreateUser" jdbcType="VARCHAR" />
-            <result column="user_update_time" property="userUpdateTime" jdbcType="TIMESTAMP" />
-            <result column="user_update_user" property="userUpdateUser" jdbcType="VARCHAR" />
-            <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"></result>
-            <result column="born" property="born" jdbcType="TIMESTAMP" />
-            <result column="sex" property="sex" jdbcType="INTEGER" />
-        </association>
     </resultMap>
 
     <update id="updateDepartment" parameterType="com.example.york.entity.Department">
@@ -40,7 +21,6 @@
         department_create_user = #{departmentCreateUser},
         department_update_time = #{departmentUpdateTime},
         department_desc = #{departmentDesc},
-        manager_user_serial = #{managerUserSerial},
         parent_department_serial = #{parentDepartmentSerial},
         department_level = #{departmentLevel}
         WHERE department_serial = #{departmentSerial}
@@ -48,13 +28,8 @@
 
     <select id="queryDepartmentListByPage" resultMap="MyBaseResultMap">
         SELECT d.department_serial,d.department_name,d.department_desc,
-        d.department_create_time,d.department_create_user,d.department_update_time,d.department_update_user,d.department_level,
-        d.manager_user_serial,d.parent_department_serial,u.user_serial,u.username
+        d.department_create_time,d.department_create_user,d.department_update_time,d.department_update_user,d.department_level,d.parent_department_serial
         FROM department_info d
-        LEFT JOIN user_info u
-        ON d.manager_user_serial = u.user_serial
-        and u.status = 0
-        and u.delete_flag = 0
         WHERE 1 = 1
         and d.delete_flag = 0
         <if test="departmentName != null and departmentName!= ''" >
@@ -82,13 +57,10 @@
     </select>
 
     <select id="getDepartmentById" resultMap="MyBaseResultMap">
-        SELECT d.*,u.user_serial,u.username
+        SELECT *
         FROM department_info d
-        LEFT JOIN user_info u
-        ON d.manager_user_serial = u.user_serial
-        and u.status = 0
-        and u.delete_flag = 0
         where d.department_serial = #{departmentId}
+        and d.delete_flag = 0
     </select>
 
     <insert id="createDepartment" parameterType="com.example.york.entity.Department">
@@ -98,11 +70,6 @@
         #{departmentCreateTime},#{parentDepartmentSerial},#{departmentLevel},#{departmentUpdateTime},#{departmentUpdateUser})
     </insert>
 
-    <select id="queryDepartmentByManagerId" resultMap="MyBaseResultMap">
-        SELECT d.*
-        FROM department_info d
-        where d.manager_user_serial = #{managerUserId}
-    </select>
 
     <select id="queryDepartmentList" resultMap="MyBaseResultMap">
         SELECT d.department_serial,d.department_name
@@ -110,8 +77,22 @@
         WHERE d.delete_flag = 0
     </select>
 
-    <select id="queryDepartmentManagerUserSerial" resultType="String">
-        SELECT di.manager_user_serial from department_info di
-        where di.department_serial = #{departmentSerial}
+    <select id="validDepartmentName" resultMap="MyBaseResultMap">
+        select di.department_serial,di.department_name
+        from department_info di
+        where di.department_name = #{departmentName}
+        and di.delete_flag = 0
     </select>
+
+    <delete id="deleteDepartmentByDepartmentSerial">
+        update department_info di set di.delete_flag = 1
+        where di.department_serial = #{departmentId}
+    </delete>
+
+    <select id="queryDepartmentByParentSerial" resultMap="MyBaseResultMap">
+        SELECT * from department_info di
+        where di.parent_department_serial = #{parentDepartmentSerial}
+        and di.delete_flag = 0
+    </select>
+
 </mapper>

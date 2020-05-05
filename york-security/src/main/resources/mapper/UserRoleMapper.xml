@@ -20,6 +20,12 @@
         WHERE user_serial = #{userId}
     </delete>
 
+    <delete id="deleteRoleByUserSerialRoleSerial">
+        DELETE FROM user_role
+        WHERE user_serial = #{userId}
+        and role_serial = #{roleId}
+    </delete>
+
     <insert id="insertRoles">
         INSERT into user_role (ur_serial,user_serial,role_serial)
         VALUES (#{urSerial},#{userId}, #{roleId})

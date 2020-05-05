@@ -80,4 +80,26 @@ public class FlowMainServiceImpl implements FlowMainService {
         return flowMainMapper.countCancelApplyList(currentUserId);
     }
 
+    /**
+     * 分页查询审批通过的流程
+     * @param currentUserId
+     * @param start
+     * @param limit
+     * @return
+     */
+    @Override
+    public List<FlowMain> queryFinishApplyListByPage(String currentUserId, Integer start, Integer limit) {
+        return flowMainMapper.queryFinishApplyListByPage(currentUserId,start,limit);
+    }
+
+    /**
+     * 查询审批通过的流程数量
+     * @param currentUserId
+     * @return
+     */
+    @Override
+    public Integer countFinishApplyList(String currentUserId) {
+        return flowMainMapper.countFinishApplyList(currentUserId);
+    }
+
 }

@@ -23,4 +23,9 @@ public interface RoleService {
 
     void createRole(RoleInfo roleInfo);
 
+    boolean validateRoleName(String roleName);
+
+    void validateUpdateRole(RoleInfo roleInfo);
+
+    RoleInfo queryRoleByRoleName(String roleName);
 }

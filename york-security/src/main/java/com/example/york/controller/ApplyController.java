@@ -153,20 +153,20 @@ public class ApplyController {
     }
 
 
-    @GetMapping("/queryLeaveWaitApproveListByPage/page")
-    @ApiOperation(value="分页查询流程任务列表" ,notes="分页查询流程任务列表")
+    @GetMapping("/queryFinishApplyListByPage/page")
+    @ApiOperation(value="分页查询审批通过的流程列表" ,notes="分页查询审批通过的流程列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "limit", value = "每页展示条数", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "processType", value = "流程类型", required = true, dataType = "String",paramType = "query")
+            @ApiImplicitParam(name = "page", value = "当前页", required = true, dataType = "int",paramType = "query")
     })
-    public PageResult queryLeaveWaitApproveListByPage(@RequestParam(value = "limit",defaultValue = "10") Integer limit, @RequestParam(value = "page",defaultValue = "1")Integer page,@RequestParam(name = "processType",defaultValue = "")String processType){
+    public PageResult queryFinishApplyListByPage(@RequestParam(value = "limit",defaultValue = "10") Integer limit, @RequestParam(value = "page",defaultValue = "1")Integer page){
         String currentUserId = getCurrentUserId();
-        PageInfo pageInfo = applyService.queryLeaveWaitApproveListByPage(limit, page,currentUserId,processType);
+        PageInfo pageInfo = applyService.queryFinishApplyListByPage(limit, page,currentUserId);
         PageResult pageResult = new PageResult("查询成功", ResponseCode.REQUEST_SUCCESS);
         pageResult.setPageInfo(pageInfo);
         return pageResult;
     }
+
 
     @GetMapping("/getLeaveApplyData")
     @SysLog
@@ -183,22 +183,5 @@ public class ApplyController {
         return leaveApplyResult;
     }
 
-    @PutMapping("/agreeLeaveApply")
-    @SysLog
-    @ApiOperation(value="审批同意请假申请", notes="审批同意请假申请")
-    @ApiImplicitParam(name = "approveResult", value = "审批同意请假申请", required = true, dataType = "ApproveResult",paramType = "body")
-    public ResponseResult agreeLeaveApply(@RequestBody ApproveResult approveResult) {
-        applyService.agreeLeaveApply(approveResult);
-        return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
-    }
-
-    @PutMapping("/backLeaveApply")
-    @SysLog
-    @ApiOperation(value="审批退回请假申请", notes="审批退回请假申请")
-    @ApiImplicitParam(name = "approveResult", value = "审批退回请假申请", required = true, dataType = "ApproveResult",paramType = "body")
-    public ResponseResult backLeaveApply(@RequestBody ApproveResult approveResult) {
-        applyService.backLeaveApply(approveResult);
-        return new ResponseResult("操作成功",ResponseCode.REQUEST_SUCCESS);
-    }
 
 }

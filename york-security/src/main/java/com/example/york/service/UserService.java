@@ -23,12 +23,23 @@ public interface UserService {
 
     void createUser(UserInfo userInfo);
 
-    List<UserInfo> queryAllUserList();
-
     List<UserInfo> queryUserByDepartmentSerial(String departmentSerial);
 
-    void updateDepartmentByUserSerial(String[] users,List<String> userSerialList, String departmentSerial);
+    boolean validUsername(String username);
 
-    void resetDepartment(String departmentSerial);
+    boolean validateEmail(String email);
 
+    UserInfo getDepartmentManagerUserSerial(String departmentSerial);
+
+    boolean validateMobile(String mobile);
+
+    void validateUpdateUser(UserInfo userInfo);
+
+    List<UserInfo> queryUserByRole(String roleSerial);
+
+    void addRoleByUserSerial(String roleSerial, String userSerial);
+
+    void deleteRoleByUserSerial(String roleSerial, String userSerial);
+
+    List<UserInfo> departmentUserQuery(String departmentSerial);
 }

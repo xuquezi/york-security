@@ -17,4 +17,7 @@ public interface FlowMainService {
 
     Integer countCancelApplyList(String currentUserId);
 
+    List<FlowMain> queryFinishApplyListByPage(String currentUserId, Integer start, Integer limit);
+
+    Integer countFinishApplyList(String currentUserId);
 }
